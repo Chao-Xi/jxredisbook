@@ -1,0 +1,30 @@
+site_name: Jacob Redis Book
+site_description: "Jacob's Redis 技术与实战教程"
+site_author: "Jacob Xi"
+copyright: "Copyright &copy; 2021-9999 Jacob Xi"
+
+plugins:
+  - search # necessary for search to work
+  - awesome-pages
+
+nav:
+  - 'Welcome': "index.md"
+
+
+repo_url: https://github.com/Chao-Xi/jxredisbook.git
+repo_name: "jxredisbook"
+
+theme: 
+  language: zh
+  name: 'material'
+  include_sidebar: true
+  logo: 'images/logo.png'
+  favicon: 'images/logo.png'
+  feature:
+    tabs: false
+  palette:
+    primary: 'pink'
+    accent: 'pink'
+  i18n:
+    prev: 'Previous'
+    next: 'Next'
