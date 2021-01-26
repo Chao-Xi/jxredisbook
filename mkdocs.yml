@@ -9,6 +9,14 @@ plugins:
 
 nav:
   - 'Welcome': "index.md"
+  - 'Redis 介绍':
+    - '第一节 Redis 不得不去掌握的关键' : 'chap1/1redis_intro.md'
+  - 'Redis 基础篇':
+    - '第一节 基本架构： 键值数据库' : 'chap2/1redis_kv.md'
+    - '第二节 数据结构：Redis为什么那么快？' : 'chap2/2redis_slowquery.md'
+    - '第三节 高性能IO模型：Redis为什么那么快？' : 'chap2/3redis_io.md'
+    - '第四节 Redis宕机，如何避免数据丢失：AOF日志' : 'chap2/4redis_aof_log.md'
+    - '第五节 Redis宕机，Redis如何实现快速恢复RDB' : 'chap2/5redis_rdb_snapshot.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
