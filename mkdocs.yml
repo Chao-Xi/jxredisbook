@@ -17,6 +17,11 @@ nav:
     - '第三节 高性能IO模型：Redis为什么那么快？' : 'chap2/3redis_io.md'
     - '第四节 Redis宕机，如何避免数据丢失：AOF日志' : 'chap2/4redis_aof_log.md'
     - '第五节 Redis宕机，Redis如何实现快速恢复RDB' : 'chap2/5redis_rdb_snapshot.md'
+    - '第六节 数据同步：主从库数据一致' : 'chap2/6redis_master_slave_replicate.md'
+    - '第七节	哨兵机制：主库不间断服务' : 'chap2/7redis_master_rescue.md'
+    - '第八节	哨兵集群：哨兵挂了，主从库切换' : 'chap2/8redis_sentinel.md'
+    - '第九节 切片集群：数据增多了，是该加内存还是加实例' : 'chap2/9redis_slot.md'
+    - 'Redis核心技术基础总结篇' : 'chap2/10redis_basic_sum.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
