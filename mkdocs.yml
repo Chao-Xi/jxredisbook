@@ -22,6 +22,13 @@ nav:
     - '第八节	哨兵集群：哨兵挂了，主从库切换' : 'chap2/8redis_sentinel.md'
     - '第九节 切片集群：数据增多了，是该加内存还是加实例' : 'chap2/9redis_slot.md'
     - 'Redis核心技术基础总结篇' : 'chap2/10redis_basic_sum.md'
+  - 'Redis 数据结构':
+    - '第一节 Redis的String类型数据结构' : 'chap3/1redis_string.md'
+    - '第二节 Redis有那些数据结构适合做统计' : 'chap3/2redis_sets.md'
+    - '第三节 GEO，一种可以实现LBS服务的数据结构' : 'chap3/3redis_geo.md'
+    - '第四节 根据时间序列数据的特点，选择合适的存储方案' : 'chap3/4redis_timeseries.md'
+    - '第五节 如何使用redis实现消息队列的需求' : 'chap3/5redis_stream.md'
+    - '第六节 Redis 的数据结构' : 'chap3/6redis_ds_sum.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
