@@ -29,6 +29,13 @@ nav:
     - '第四节 根据时间序列数据的特点，选择合适的存储方案' : 'chap3/4redis_timeseries.md'
     - '第五节 如何使用redis实现消息队列的需求' : 'chap3/5redis_stream.md'
     - '第六节 Redis 的数据结构' : 'chap3/6redis_ds_sum.md'
+  - 'Redis 性能影响因子':
+    - '第一节 Redis有哪些可能导致阻塞的操作' : 'chap4/1redis_asyn.md'
+    - '第二节 在多核CPU架构和NUMA架构下对redis进行优化配置' : 'chap4/2redis_cpu.md'
+    - '第三节 当redis查询变慢了怎么办？' : 'chap4/3redis_response.md'
+    - '第四节 删除数据后，内存占用率还是很高' : 'chap4/4redis_timeseries.md'
+    - '第五节 Redis缓冲区' : 'chap4/5redis_buffer.md'
+    - 'Redis 影响性能的潜在因素' : 'chap4/6redis_slow_respone.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
