@@ -35,7 +35,13 @@ nav:
     - '第三节 当redis查询变慢了怎么办？' : 'chap4/3redis_response.md'
     - '第四节 删除数据后，内存占用率还是很高' : 'chap4/4redis_fragmentation.md'
     - '第五节 Redis缓冲区' : 'chap4/5redis_buffer.md'
-    - 'Redis 影响性能的潜在因素' : 'chap4/6redis_slow_respone.md'
+    - '第六节 Redis 影响性能的潜在因素' : 'chap4/6redis_slow_respone.md'
+  - 'Redis 缓存介绍':
+    - '第一节 Redis 旁路缓存' : 'chap5/1redis_cache.md'
+    - '第二节 缓存满后的替换策略' : 'chap5/2redis_cache_full.md'
+    - '第三节 如何解决缓存和数据库的数据不一致的缓存异常' : 'chap5/3redis_mysql_uncon.md'
+    - '*第四节 缓存被污染的解决问题' : 'chap5/4redis_contamination.md'
+    - '第六节 Redis 缓存总结' : 'chap5/5redis_cache_summary.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
