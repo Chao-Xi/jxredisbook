@@ -41,7 +41,13 @@ nav:
     - '第二节 缓存满后的替换策略' : 'chap5/2redis_cache_full.md'
     - '第三节 如何解决缓存和数据库的数据不一致的缓存异常' : 'chap5/3redis_mysql_uncon.md'
     - '第四节 缓存被污染的解决问题' : 'chap5/4redis_contamination.md'
-    - '第六节 Redis 缓存总结' : 'chap5/5redis_cache_summary.md'
+    - '第五节 Redis 缓存总结' : 'chap5/5redis_cache_summary.md'
+  - 'Redis 性能与锁机制以及ACID':
+    - '第一节 基于SSD实现大容量Redis:Pika' : 'chap6/1redis_pika_ssd.md'
+    - '第二节 Redis应对并发访问：无锁的原子操作' : 'chap6/2redis_locks.md'
+    - '第三节 Redis实现分布式锁' : 'chap6/3redis_distributed_locks.md'
+    - '第四节 事务机制 Redis实现ACID属性' : 'chap6/4redis_acid.md'
+    - '第五节 Redis性能与锁机制以及ACID总结' : 'chap6/5redis_perf.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
