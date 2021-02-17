@@ -21,33 +21,41 @@ nav:
     - '第七节	哨兵机制：主库不间断服务' : 'chap2/7redis_master_rescue.md'
     - '第八节	哨兵集群：哨兵挂了，主从库切换' : 'chap2/8redis_sentinel.md'
     - '第九节 切片集群：数据增多了，是该加内存还是加实例' : 'chap2/9redis_slot.md'
-    - 'Redis核心技术基础总结篇' : 'chap2/10redis_basic_sum.md'
+    - '第二章 Redis核心技术基础总结篇' : 'chap2/10redis_basic_sum.md'
   - 'Redis 数据结构':
     - '第一节 Redis的String类型数据结构' : 'chap3/1redis_string.md'
     - '第二节 Redis有那些数据结构适合做统计' : 'chap3/2redis_sets.md'
     - '第三节 GEO，一种可以实现LBS服务的数据结构' : 'chap3/3redis_geo.md'
     - '第四节 根据时间序列数据的特点，选择合适的存储方案' : 'chap3/4redis_timeseries.md'
     - '第五节 如何使用redis实现消息队列的需求' : 'chap3/5redis_stream.md'
-    - '第六节 Redis 的数据结构' : 'chap3/6redis_ds_sum.md'
+    - '第三章 Redis 的数据结构' : 'chap3/6redis_ds_sum.md'
   - 'Redis 性能影响因子':
     - '第一节 Redis有哪些可能导致阻塞的操作' : 'chap4/1redis_asyn.md'
     - '第二节 在多核CPU架构和NUMA架构下对redis进行优化配置' : 'chap4/2redis_cpu.md'
     - '第三节 当redis查询变慢了怎么办？' : 'chap4/3redis_response.md'
     - '第四节 删除数据后，内存占用率还是很高' : 'chap4/4redis_fragmentation.md'
     - '第五节 Redis缓冲区' : 'chap4/5redis_buffer.md'
-    - '第六节 Redis 影响性能的潜在因素' : 'chap4/6redis_slow_respone.md'
+    - '第四章 Redis 影响性能的潜在因素' : 'chap4/6redis_slow_respone.md'
   - 'Redis 缓存介绍':
     - '第一节 Redis 旁路缓存' : 'chap5/1redis_cache.md'
     - '第二节 缓存满后的替换策略' : 'chap5/2redis_cache_full.md'
     - '第三节 如何解决缓存和数据库的数据不一致的缓存异常' : 'chap5/3redis_mysql_uncon.md'
     - '第四节 缓存被污染的解决问题' : 'chap5/4redis_contamination.md'
-    - '第五节 Redis 缓存总结' : 'chap5/5redis_cache_summary.md'
+    - '第五章 Redis 缓存总结' : 'chap5/5redis_cache_summary.md'
   - 'Redis 性能与锁机制以及ACID':
     - '第一节 基于SSD实现大容量Redis:Pika' : 'chap6/1redis_pika_ssd.md'
     - '第二节 Redis应对并发访问：无锁的原子操作' : 'chap6/2redis_locks.md'
     - '第三节 Redis实现分布式锁' : 'chap6/3redis_distributed_locks.md'
     - '第四节 事务机制 Redis实现ACID属性' : 'chap6/4redis_acid.md'
-    - '第五节 Redis性能与锁机制以及ACID总结' : 'chap6/5redis_perf.md'
+    - '第六章 Redis性能与锁机制以及ACID总结' : 'chap6/5redis_perf.md'
+  - 'Redis Cluster集群介绍及管理':
+    - '第一节 Redis主从同步与故障切换的三个坑' : 'chap7/1Redis_master_slave.md'
+    - '第二节 脑裂导致数据丢失' : 'chap7/2redis_brain_split.md'
+    - '第三节 Redis Codis 集群方案' : 'chap7/3redis_codis_cluster.md'
+    - '第四节 Redis支撑秒杀场景的关键技术和实践' : 'chap7/4redis_spike_sys.md'
+    - '第五节 数据分布优化应对数据倾斜' : 'chap7/5redis_data_incline.md'
+    - '第六节 限制Redis Cluster规模的关键因素:通信开销' : 'chap7/6redis_cluster_gossip.md'
+    - '第七章 Redis Cluster集群介绍及管理' : 'chap7/7Redis_cluster_summary.md'
 
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
