@@ -2,7 +2,7 @@
 
 ## **1、Configuring Redis using a ConfigMap**
 
-[部署及测试代码文件](../files/redis-config/)
+[部署及测试代码文件](https://github.com/Chao-Xi/jxredisbook/tree/master/docs/files/redis-config)
 
 First create a `kustomization.yaml` containing a ConfigMap from the redis-config file:
 
