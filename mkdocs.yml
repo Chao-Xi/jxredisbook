@@ -63,7 +63,10 @@ nav:
     - '第四节 Redis运维工具' : 'chap8/4redis_opt_tools.md'
     - '第五节 Redis的使用规范' : 'chap8/5redis_protocol.md'
     - '第八章 Redis学习与操作总结' : 'chap8/6redis_opt_summary.md'
-
+    - '工具补充1：redis-shake数据同步和数据迁移' : 'chap8/7redis_shake.md'
+  - '第九章 使用k8s安装Redis集群':
+    - '第一节 Kubernetes上通过sts测试Redis Cluster' : 'chap9/1redis_k8s_sts.md'
+    - '第二节 利用ConfigMap设置安装 Redis' : 'chap9/2redis_k8s_config.md'
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
 repo_name: "jxredisbook"
