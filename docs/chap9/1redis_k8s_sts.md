@@ -27,6 +27,8 @@ Redis代表**Remote Dictionary Server** 是一种开源的内存中数据存储�
 
 ### **4-1 部署Redis集群**
 
+[部署及测试代码文件](../files/redis-sts/)
+
 创建statefulset类型资源 
 
 **`redis-sts.yml`**
