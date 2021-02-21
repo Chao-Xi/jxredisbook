@@ -8,12 +8,20 @@
 
 ## 内容简介
 
-本书是本人的“手摸手战术教程”系列的第三本，历经两个月的时间，终于伴随着2021年春节前拿本🏡和春节假期期间🎆充电完成🍋，感谢家人👬，朋友，同事们的支持与理解，也感谢所在team同事们的帮助与指导。为了还贷！！！😁 #顺便求一个Cloudhouse的邀请
+本书是本人的“手摸手战术教程”系列的第三本，历经两个月的时间，终于伴随着2021年春节前拿本🏡和春节假期期间🎆充电完成🍋，感谢家人，朋友，同事们的支持与理解，也感谢所在team同事们的帮助与指导。为了还贷！！！😁 #顺便求一个Cloudhouse的邀请
+
+
+### Previous on 手摸手
 
 > [手摸手 Jenkins 战术教程 (大师版）](https://chao-xi.github.io/jxjenkinsbook/)
 > 
 > [手摸手 Elasticsearch7 技术与实战教程](https://chao-xi.github.io/jxes7book/)
 
+### 本书主要内容
+
+本书共10章着重介绍了Redis核心基础数据结构，AOF日志，RDB备份，Redis主从数据同步，哨兵机制，Redis Cluster, 切片集群，Bigkey阻塞查询，Redis缓冲区，旁路缓存，LRU-LFU缓存替换策略，缓存击穿，缓存雪崩，缓存穿透，缓存污染，ACID & Locks & Pika, Codis, Gossip, 脑裂，数据倾斜，Redis6.0,NVM, RESP, Redis on K8s 以及期中期末综合考题
+
+![Alt Image Text](images/chap1_2.png "Body image")
 
 ## Comment ca va? C'est Moi
 
