@@ -91,6 +91,7 @@ Je travaillais en tant qu'ingénieur backend à New York et j'ai obtenu mon mast
 	* [第三节 Redis客户端如何与服务器端交换命令和数据 RESP](https://chao-xi.github.io/jxredisbook/chap8/3redis_RESP/)
 	* [第四节 Redis运维工具](https://chao-xi.github.io/jxredisbook/chap8/4redis_opt_tools/)
 	* [第五节 Redis的使用规范](https://chao-xi.github.io/jxredisbook/chap8/5redis_protocol/)
+	* [第六节 Redis如何删除数量过万以上Key而不影响业务](https://chao-xi.github.io/jxredisbook/chap8/8redis_keys/)
 	* [第八章 Redis学习与操作总结](https://chao-xi.github.io/jxredisbook/chap8/6redis_opt_summary/)
 	* [工具补充1：redis-shake数据同步和数据迁移](https://chao-xi.github.io/jxredisbook/chap8/7redis_shake/)
 * **第九章 使用k8s安装Redis集群**
