@@ -84,6 +84,7 @@ Je travaillais en tant qu'ingénieur backend à New York et j'ai obtenu mon mast
 	* [第四节 Redis支撑秒杀场景的关键技术和实践](https://chao-xi.github.io/jxredisbook/chap7/4redis_spike_sys/)
 	* [第五节 数据分布优化应对数据倾斜](https://chao-xi.github.io/jxredisbook/chap7/5redis_data_incline/)
 	* [第六节 限制Redis Cluster规模的关键因素：通信开销](https://chao-xi.github.io/jxredisbook/chap7/6redis_cluster_gossip/)
+	* [第七节 Redis 高可用性解决方案](ttps://chao-xi.github.io/jxredisbook/chap7/8Redis_HA/)
 	* [第七章 Redis Cluster集群介绍及管理](https://chao-xi.github.io/jxredisbook/chap7/7Redis_cluster_summary/)
 * **第八章 Redis学习与操作**
 	* [第一节 Redis 6.0的新特性：多线程、客户端缓存与安全](https://chao-xi.github.io/jxredisbook/chap8/1redis_6.0_fea/)

@@ -55,6 +55,7 @@ nav:
     - '第四节 Redis支撑秒杀场景的关键技术和实践' : 'chap7/4redis_spike_sys.md'
     - '第五节 数据分布优化应对数据倾斜' : 'chap7/5redis_data_incline.md'
     - '第六节 限制Redis Cluster规模的关键因素:通信开销' : 'chap7/6redis_cluster_gossip.md'
+    - '第七节 Redis 高可用性解决方案': 'chap7/8Redis_HA.md'
     - '第七章 Redis Cluster集群介绍及管理' : 'chap7/7Redis_cluster_summary.md'
   - '第八章 Redis学习与操作':
     - '第一节 Redis 6.0的新特性：多线程、客户端缓存与安全' : 'chap8/1redis_6.0_fea.md'
