@@ -38,7 +38,7 @@ Je travaillais en tant qu'ingénieur backend à New York et j'ai obtenu mon mast
 
 ## 目录大纲
 
-* **第一章 Elasticsearch 概述**
+* **第一章 Redis 概述**
 	* [第一节 Redis 不得不去掌握的关键](https://chao-xi.github.io/jxredisbook/chap1/1redis_intro/)
 * **第二章 Redis基础篇**
 	* [第一节 基本架构： 键值数据库](https://chao-xi.github.io/jxredisbook/chap2/1redis_kv/) 
