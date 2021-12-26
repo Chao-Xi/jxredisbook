@@ -102,6 +102,7 @@ Je travaillais en tant qu'ingénieur backend à New York et j'ai obtenu mon mast
 	* [Redis 核心技术考题](https://chao-xi.github.io/jxredisbook/chap10/1redis_test/)
 	* [Redis 基础你掌握多少了？来个查漏补缺](https://chao-xi.github.io/jxredisbook/chap10/3Redis_basic/)
 	* [40 道Redis面试题](https://chao-xi.github.io/jxredisbook/chap10/2Redis_interview/)
+	* [115 道 Redis 面试题解答](https://chao-xi.github.io/jxredisbook/chap10/4Redis_int_all/)
 
 ## To be continue
 
