@@ -74,6 +74,7 @@ nav:
     - 'Redis 基础你掌握多少了？来个查漏补缺' : 'chap10/3Redis_basic.md'
     - '40 道Redis面试题' : 'chap10/2Redis_interview.md'
     - '115 道 Redis 面试题解答': 'chap10/4Redis_int_all.md'
+    - 'Redis6.0与缓存大全基础面试': 'chap10/5redis6_int.md'
 
 repo_url: https://github.com/Chao-Xi/jxredisbook.git
 repo_name: "jxredisbook"
