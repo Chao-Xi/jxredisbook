@@ -1,0 +1,1689 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Jacob's Redis 技术与实战教程">
+      
+      
+        <meta name="author" content="Jacob Xi">
+      
+      
+      <link rel="icon" href="images/logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.5">
+    
+    
+      
+        <title>Jacob Redis Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.2d9f7617.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#e92063">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#redis" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="." title="Jacob Redis Book" class="md-header__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jacob Redis Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Welcome
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="Jacob Redis Book" class="md-nav__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="images/logo.png" alt="logo">
+
+    </a>
+    Jacob Redis Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Welcome
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        Welcome
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    内容简介
+  </a>
+  
+    <nav class="md-nav" aria-label="内容简介">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#previous-on" class="md-nav__link">
+    Previous on 手摸手
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    本书主要内容
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comment-ca-va-cest-moi" class="md-nav__link">
+    Comment ca va? C'est Moi
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    目录大纲
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-be-continue" class="md-nav__link">
+    To be continue
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          第一章 Redis介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第一章 Redis介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          第一章 Redis介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap1/1redis_intro/" class="md-nav__link">
+        第一节 Redis 不得不去掌握的关键
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          第二章 Redis基础篇
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第二章 Redis基础篇" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          第二章 Redis基础篇
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/1redis_kv/" class="md-nav__link">
+        第一节 基本架构： 键值数据库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/2redis_slowquery/" class="md-nav__link">
+        第二节 数据结构：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/3redis_io/" class="md-nav__link">
+        第三节 高性能IO模型：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/4redis_aof_log/" class="md-nav__link">
+        第四节 Redis宕机，如何避免数据丢失：AOF日志
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/5redis_rdb_snapshot/" class="md-nav__link">
+        第五节 Redis宕机，Redis如何实现快速恢复RDB
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/6redis_master_slave_replicate/" class="md-nav__link">
+        第六节 数据同步：主从库数据一致
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/7redis_master_rescue/" class="md-nav__link">
+        第七节	哨兵机制：主库不间断服务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/8redis_sentinel/" class="md-nav__link">
+        第八节	哨兵集群：哨兵挂了，主从库切换
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/9redis_slot/" class="md-nav__link">
+        第九节 切片集群：数据增多了，是该加内存还是加实例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap2/10redis_basic_sum/" class="md-nav__link">
+        第二章 Redis核心技术基础总结篇
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          第三章 Redis数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第三章 Redis数据结构" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          第三章 Redis数据结构
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/1redis_string/" class="md-nav__link">
+        第一节 Redis的String类型数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/2redis_sets/" class="md-nav__link">
+        第二节 Redis有那些数据结构适合做统计
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/3redis_geo/" class="md-nav__link">
+        第三节 GEO，一种可以实现LBS服务的数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/4redis_timeseries/" class="md-nav__link">
+        第四节 根据时间序列数据的特点，选择合适的存储方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/5redis_stream/" class="md-nav__link">
+        第五节 如何使用redis实现消息队列的需求
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap3/6redis_ds_sum/" class="md-nav__link">
+        第三章 Redis 的数据结构
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          第四章 Redis性能影响因子
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第四章 Redis性能影响因子" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          第四章 Redis性能影响因子
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/1redis_asyn/" class="md-nav__link">
+        第一节 Redis有哪些可能导致阻塞的操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/2redis_cpu/" class="md-nav__link">
+        第二节 在多核CPU架构和NUMA架构下对redis进行优化配置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/3redis_response/" class="md-nav__link">
+        第三节 当redis查询变慢了怎么办？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/4redis_fragmentation/" class="md-nav__link">
+        第四节 删除数据后，内存占用率还是很高
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/5redis_buffer/" class="md-nav__link">
+        第五节 Redis缓冲区
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap4/6redis_slow_respone/" class="md-nav__link">
+        第四章 Redis 影响性能的潜在因素
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          第五章 Redis缓存介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第五章 Redis缓存介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          第五章 Redis缓存介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap5/1redis_cache/" class="md-nav__link">
+        第一节 Redis 旁路缓存
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap5/2redis_cache_full/" class="md-nav__link">
+        第二节 缓存满后的替换策略
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap5/3redis_mysql_uncon/" class="md-nav__link">
+        第三节 如何解决缓存和数据库的数据不一致的缓存异常
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap5/4redis_contamination/" class="md-nav__link">
+        第四节 缓存被污染的解决问题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap5/5redis_cache_summary/" class="md-nav__link">
+        第五章 Redis 缓存总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          第六章 Redis性能与锁机制以及ACID
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第六章 Redis性能与锁机制以及ACID" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          第六章 Redis性能与锁机制以及ACID
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap6/1redis_pika_ssd/" class="md-nav__link">
+        第一节 基于SSD实现大容量Redis:Pika
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap6/2redis_locks/" class="md-nav__link">
+        第二节 Redis应对并发访问：无锁的原子操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap6/3redis_distributed_locks/" class="md-nav__link">
+        第三节 Redis实现分布式锁
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap6/4redis_acid/" class="md-nav__link">
+        第四节 事务机制 Redis实现ACID属性
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap6/5redis_perf/" class="md-nav__link">
+        第六章 Redis性能与锁机制以及ACID总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          第七章 Redis Cluster集群介绍及管理
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第七章 Redis Cluster集群介绍及管理" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          第七章 Redis Cluster集群介绍及管理
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/1Redis_master_slave/" class="md-nav__link">
+        第一节 Redis主从同步与故障切换的三个坑
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/2redis_brain_split/" class="md-nav__link">
+        第二节 脑裂导致数据丢失
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/3redis_codis_cluster/" class="md-nav__link">
+        第三节 Redis Codis 集群方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/4redis_spike_sys/" class="md-nav__link">
+        第四节 Redis支撑秒杀场景的关键技术和实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/5redis_data_incline/" class="md-nav__link">
+        第五节 数据分布优化应对数据倾斜
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/6redis_cluster_gossip/" class="md-nav__link">
+        第六节 限制Redis Cluster规模的关键因素:通信开销
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/8Redis_HA/" class="md-nav__link">
+        第七节 Redis 高可用性解决方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap7/7Redis_cluster_summary/" class="md-nav__link">
+        第七章 Redis Cluster集群介绍及管理
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          第八章 Redis学习与操作
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第八章 Redis学习与操作" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          第八章 Redis学习与操作
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/1redis_6.0_fea/" class="md-nav__link">
+        第一节 Redis 6.0的新特性：多线程、客户端缓存与安全
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/2redis_nvm_mem/" class="md-nav__link">
+        第二节 Redis 基于NVM内存的实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/3redis_RESP/" class="md-nav__link">
+        第三节 Redis客户端如何与服务器端交换命令和数据 RESP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/4redis_opt_tools/" class="md-nav__link">
+        第四节 Redis运维工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/5redis_protocol/" class="md-nav__link">
+        第五节 Redis的使用规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/8redis_keys/" class="md-nav__link">
+        第六节 Redis如何删除数量过万以上Key而不影响业务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/6redis_opt_summary/" class="md-nav__link">
+        第八章 Redis学习与操作总结
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap8/7redis_shake/" class="md-nav__link">
+        工具补充1：redis-shake数据同步和数据迁移
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          第九章 使用k8s安装Redis集群
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第九章 使用k8s安装Redis集群" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          第九章 使用k8s安装Redis集群
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap9/1redis_k8s_sts/" class="md-nav__link">
+        第一节 Kubernetes上通过sts测试Redis Cluster
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap9/2redis_k8s_config/" class="md-nav__link">
+        第二节 利用ConfigMap设置安装 Redis
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          第十章 期末总结章
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第十章 期末总结章" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          第十章 期末总结章
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap10/1redis_test/" class="md-nav__link">
+        Redis 核心技术考题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap10/3Redis_basic/" class="md-nav__link">
+        Redis 基础你掌握多少了？来个查漏补缺
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap10/2Redis_interview/" class="md-nav__link">
+        40 道Redis面试题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap10/4Redis_int_all/" class="md-nav__link">
+        115 道 Redis 面试题解答
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chap10/5redis6_int/" class="md-nav__link">
+        Redis6.0与缓存大全基础面试
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    内容简介
+  </a>
+  
+    <nav class="md-nav" aria-label="内容简介">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#previous-on" class="md-nav__link">
+    Previous on 手摸手
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    本书主要内容
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comment-ca-va-cest-moi" class="md-nav__link">
+    Comment ca va? C'est Moi
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    目录大纲
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#to-be-continue" class="md-nav__link">
+    To be continue
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/Chao-Xi/jxredisbook.git/edit/master/docs/index.md" title="编辑此页" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="redis">手摸手 Redis 技术与实战教程</h1>
+<blockquote>
+<p>Started at Jan. 2021 By Jacob Xi </p>
+</blockquote>
+<p><img alt="Alt Image Text" src="images/indx1_0.png" title="Body image" /></p>
+<h2 id="_1">内容简介</h2>
+<p>本书是本人的“手摸手战术教程”系列的第三本，历经两个月的时间，终于伴随着2021年春节前拿本🏡和春节假期期间🎆充电完成🍋，感谢家人，朋友，同事们的支持与理解，也感谢所在team同事们的帮助与指导。为了还贷！！！😁 #顺便求一个Cloudhouse的邀请</p>
+<h3 id="previous-on">Previous on 手摸手</h3>
+<blockquote>
+<p><a href="https://chao-xi.github.io/jxjenkinsbook/">手摸手 Jenkins 战术教程 (大师版）</a></p>
+<p><a href="https://chao-xi.github.io/jxes7book/">手摸手 Elasticsearch7 技术与实战教程</a></p>
+</blockquote>
+<h3 id="_2">本书主要内容</h3>
+<p>本书共10章着重介绍了Redis核心基础数据结构，AOF日志，RDB备份，Redis主从数据同步，哨兵机制，Redis Cluster, 切片集群，Bigkey阻塞查询，Redis缓冲区，旁路缓存，LRU-LFU缓存替换策略，缓存击穿，缓存雪崩，缓存穿透，缓存污染，ACID &amp; Locks &amp; Pika, Codis, Gossip, 脑裂，数据倾斜，Redis6.0,NVM, RESP, Redis on K8s 以及期中期末综合考题</p>
+<p><img alt="Alt Image Text" src="images/chap1_2.png" title="Body image" /></p>
+<h2 id="comment-ca-va-cest-moi">Comment ca va? C'est Moi</h2>
+<p>Hello, this is me, Jacob. Currently, I'm working as DevOps and Cloud Engineer in SAP, and I'm the certified AWS Solution Architect and Certified Azure Administrator, Kubernetes Specialist, Jenkins CI/CD and ElasticStack enthusiast. </p>
+<p>I was working as Backend Engineer in New York City and achieved my CS master degree in SIT, America. Believe it or not, I'll keep writing, more and more books will come out at such dramatic and unprecedented 2021. </p>
+<p>If you have anything want to talk to me directly, you can reach out for via email xichao2015@outlook.com。</p>
+<p>Salute, c'est moi, Jacob. Actuellement, je travaille en tant qu'ingénieur DevOps et Cloud dans SAP, et je suis architecte de solution AWS certifié et administrateur Azure certifié, spécialiste Kubernetes et passionné de CI/CD.</p>
+<p>Je travaillais en tant qu'ingénieur backend à New York et j'ai obtenu mon master CS à SIT, en Amérique. Croyez-le ou non, je continuerai à écrire, de plus en plus de livres sortiront cette année.</p>
+<h2 id="_3">目录大纲</h2>
+<ul>
+<li><strong>第一章 Redis 概述</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap1/1redis_intro/">第一节 Redis 不得不去掌握的关键</a></li>
+</ul>
+</li>
+<li><strong>第二章 Redis基础篇</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/1redis_kv/">第一节 基本架构： 键值数据库</a> </li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/2redis_slowquery/">第二节 数据结构：Redis为什么那么快？</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/3redis_io/">第三节 高性能IO模型：Redis为什么那么快？</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/4redis_aof_log/">第四节 Redis宕机，如何避免数据丢失：AOF(Append Only File)日志</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/5redis_rdb_snapshot/">第五节 Redis宕机，Redis如何实现快速恢复RDB</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/6redis_master_slave_replicate/">第六节 数据同步：主从库数据一致</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/7redis_master_rescue/">第七节 哨兵机制：主库不间断服务</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/8redis_sentinel/">第八节 哨兵集群：哨兵挂了，主从库切换</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/9redis_slot/">第九节 切片集群：数据增多了，是该加内存还是加实例</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap2/10redis_basic_sum/">第二章 Redis核心技术基础总结篇</a></li>
+</ul>
+</li>
+<li><strong>第三章 Redis数据结构</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/1redis_string/">第一节 Redis的String类型数据结构，及其底层实现</a> </li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/2redis_sets/">第二节 Redis有那些数据结构适合做统计</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/3redis_geo/">第三节 GEO，一种可以实现LBS服务的数据结构</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/4redis_timeseries/">第四节 根据时间序列数据的特点，选择合适的存储方案</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/5redis_stream/">第五节 如何使用redis实现消息队列的需求</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap3/6redis_ds_sum/">第三章 Redis 的数据结构</a></li>
+</ul>
+</li>
+<li><strong>第四章 Redis性能影响因子</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/1redis_asyn/">第一节 Redis有哪些可能导致阻塞的操作，以及解决机制</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/2redis_cpu/">第二节 在多核CPU架构和NUMA架构下对redis进行优化配置</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/3redis_response/">第三节 当redis查询变慢了怎么办？</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/4redis_fragmentation/">第四节 删除数据后，内存占用率还是很高</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/5redis_buffer/">第五节 Redis缓冲区</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap4/6redis_slow_respone/">第四章 Redis 影响性能的潜在因素</a></li>
+</ul>
+</li>
+<li><strong>第五章 Redis缓存介绍</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap5/1redis_cache/">第一节 Redis 旁路缓存</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap5/2redis_cache_full/">第二节 缓存满后的替换策略</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap5/3redis_mysql_uncon/">第三节 如何解决缓存和数据库的数据不一致的缓存异常</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap5/4redis_contamination/">第四节 缓存被污染的解决问题</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap5/5redis_cache_summary/">第五章 Redis 缓存总结</a></li>
+</ul>
+</li>
+<li><strong>第六章 Redis性能与锁机制以及ACID</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap6/1redis_pika_ssd/">第一节 基于SSD实现大容量Redis:Pika</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap6/2redis_locks/">第二节 Redis应对并发访问：无锁的原子操作</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap6/3redis_distributed_locks/">第三节 Redis实现分布式锁</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap6/4redis_acid/">第四节 事务机制 Redis实现ACID属性</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap6/5redis_perf/">第六章 Redis性能与锁机制以及ACID</a></li>
+</ul>
+</li>
+<li><strong>第七章 Redis Cluster集群介绍及管理</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/1Redis_master_slave/">第一节 Redis主从同步与故障切换的三个坑</a> </li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/2redis_brain_split/">第二节 脑裂导致数据丢失</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/3redis_codis_cluster/">第三节 Redis Codis 集群方案</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/4redis_spike_sys/">第四节 Redis支撑秒杀场景的关键技术和实践</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/5redis_data_incline/">第五节 数据分布优化应对数据倾斜</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/6redis_cluster_gossip/">第六节 限制Redis Cluster规模的关键因素：通信开销</a></li>
+<li><a href="ttps://chao-xi.github.io/jxredisbook/chap7/8Redis_HA/">第七节 Redis 高可用性解决方案</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap7/7Redis_cluster_summary/">第七章 Redis Cluster集群介绍及管理</a></li>
+</ul>
+</li>
+<li><strong>第八章 Redis学习与操作</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/1redis_6.0_fea/">第一节 Redis 6.0的新特性：多线程、客户端缓存与安全</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/2redis_nvm_mem/">第二节 Redis 基于NVM内存的实践</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/3redis_RESP/">第三节 Redis客户端如何与服务器端交换命令和数据 RESP</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/4redis_opt_tools/">第四节 Redis运维工具</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/5redis_protocol/">第五节 Redis的使用规范</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/8redis_keys/">第六节 Redis如何删除数量过万以上Key而不影响业务</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/6redis_opt_summary/">第八章 Redis学习与操作总结</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap8/7redis_shake/">工具补充1：redis-shake数据同步和数据迁移</a></li>
+</ul>
+</li>
+<li><strong>第九章 使用k8s安装Redis集群</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap9/1redis_k8s_sts/">第一节 Kubernetes上通过sts测试Redis Cluster集群</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap9/2redis_k8s_config/">第二节 利用ConfigMap设置安装 Redis</a></li>
+</ul>
+</li>
+<li><strong>第十章 期末总结章</strong><ul>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap10/1redis_test/">Redis 核心技术考题</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap10/3Redis_basic/">Redis 基础你掌握多少了？来个查漏补缺</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap10/2Redis_interview/">40 道Redis面试题</a></li>
+<li><a href="https://chao-xi.github.io/jxredisbook/chap10/4Redis_int_all/">115 道 Redis 面试题解答</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="to-be-continue">To be continue</h2>
+<p>本人将带来手摸手战术教程更多的内容和文章， 接下来的将在Datatase, Linux性能, Golang, Chef, Azure900, Azure103, AWS Solution Arcitect, AWS Big Data Speciality, Istio, Python带来更多更全面的电子书，敬请期待。</p>
+<p><img alt="Alt Image Text" src="images/indx1_1.png" title="Body image" /></p>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="页脚">
+      
+      
+        
+        <a href="chap1/1redis_intro/" class="md-footer__link md-footer__link--next" aria-label="下一页: 第一节 Redis 不得不去掌握的关键" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              第一节 Redis 不得不去掌握的关键
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021-9999 Jacob Xi
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "search": "assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    
+    
+      <script src="assets/javascripts/bundle.467223ff.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2135 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Jacob's Redis 技术与实战教程">
+      
+      
+        <meta name="author" content="Jacob Xi">
+      
+      
+      <link rel="icon" href="../../images/logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.5">
+    
+    
+      
+        <title>第三章 Redis 的数据结构 - Jacob Redis Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2d9f7617.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#e92063">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#redis" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Jacob Redis Book" class="md-header__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jacob Redis Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第三章 Redis 的数据结构
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Jacob Redis Book" class="md-nav__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Jacob Redis Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          第一章 Redis介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第一章 Redis介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          第一章 Redis介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap1/1redis_intro/" class="md-nav__link">
+        第一节 Redis 不得不去掌握的关键
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          第二章 Redis基础篇
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第二章 Redis基础篇" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          第二章 Redis基础篇
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/1redis_kv/" class="md-nav__link">
+        第一节 基本架构： 键值数据库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/2redis_slowquery/" class="md-nav__link">
+        第二节 数据结构：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/3redis_io/" class="md-nav__link">
+        第三节 高性能IO模型：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/4redis_aof_log/" class="md-nav__link">
+        第四节 Redis宕机，如何避免数据丢失：AOF日志
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/5redis_rdb_snapshot/" class="md-nav__link">
+        第五节 Redis宕机，Redis如何实现快速恢复RDB
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/6redis_master_slave_replicate/" class="md-nav__link">
+        第六节 数据同步：主从库数据一致
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/7redis_master_rescue/" class="md-nav__link">
+        第七节	哨兵机制：主库不间断服务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/8redis_sentinel/" class="md-nav__link">
+        第八节	哨兵集群：哨兵挂了，主从库切换
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/9redis_slot/" class="md-nav__link">
+        第九节 切片集群：数据增多了，是该加内存还是加实例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/10redis_basic_sum/" class="md-nav__link">
+        第二章 Redis核心技术基础总结篇
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          第三章 Redis数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第三章 Redis数据结构" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          第三章 Redis数据结构
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1redis_string/" class="md-nav__link">
+        第一节 Redis的String类型数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2redis_sets/" class="md-nav__link">
+        第二节 Redis有那些数据结构适合做统计
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3redis_geo/" class="md-nav__link">
+        第三节 GEO，一种可以实现LBS服务的数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4redis_timeseries/" class="md-nav__link">
+        第四节 根据时间序列数据的特点，选择合适的存储方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5redis_stream/" class="md-nav__link">
+        第五节 如何使用redis实现消息队列的需求
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          第三章 Redis 的数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        第三章 Redis 的数据结构
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1、章节小结
+  </a>
+  
+    <nav class="md-nav" aria-label="1、章节小结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-redisstring" class="md-nav__link">
+    1-1 Redis的String类型数据结构，及其底层实现
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis" class="md-nav__link">
+    1-2 Redis有那些数据结构适合做统计
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-geolbs" class="md-nav__link">
+    1-3 GEO，一种可以实现LBS服务的数据结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4" class="md-nav__link">
+    1-4 根据时间序列数据的特点，选择合适的存储方案
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-5-redis" class="md-nav__link">
+    1-5 如何使用redis实现消息队列的需求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2、本章操作总结
+  </a>
+  
+    <nav class="md-nav" aria-label="2、本章操作总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-redisstring_1" class="md-nav__link">
+    1-1 Redis的String类型数据结构，及其底层实现
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis_1" class="md-nav__link">
+    1-2 Redis有那些数据结构适合做统计
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-geolbs_1" class="md-nav__link">
+    1-3 GEO，一种可以实现LBS服务的数据结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4_1" class="md-nav__link">
+    1-4 根据时间序列数据的特点，选择合适的存储方案
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-5-redis_1" class="md-nav__link">
+    1-5 如何使用redis实现消息队列的需求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3、章节小问
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          第四章 Redis性能影响因子
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第四章 Redis性能影响因子" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          第四章 Redis性能影响因子
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/1redis_asyn/" class="md-nav__link">
+        第一节 Redis有哪些可能导致阻塞的操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/2redis_cpu/" class="md-nav__link">
+        第二节 在多核CPU架构和NUMA架构下对redis进行优化配置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/3redis_response/" class="md-nav__link">
+        第三节 当redis查询变慢了怎么办？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/4redis_fragmentation/" class="md-nav__link">
+        第四节 删除数据后，内存占用率还是很高
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/5redis_buffer/" class="md-nav__link">
+        第五节 Redis缓冲区
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap4/6redis_slow_respone/" class="md-nav__link">
+        第四章 Redis 影响性能的潜在因素
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          第五章 Redis缓存介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第五章 Redis缓存介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          第五章 Redis缓存介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/1redis_cache/" class="md-nav__link">
+        第一节 Redis 旁路缓存
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/2redis_cache_full/" class="md-nav__link">
+        第二节 缓存满后的替换策略
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/3redis_mysql_uncon/" class="md-nav__link">
+        第三节 如何解决缓存和数据库的数据不一致的缓存异常
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/4redis_contamination/" class="md-nav__link">
+        第四节 缓存被污染的解决问题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/5redis_cache_summary/" class="md-nav__link">
+        第五章 Redis 缓存总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          第六章 Redis性能与锁机制以及ACID
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第六章 Redis性能与锁机制以及ACID" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          第六章 Redis性能与锁机制以及ACID
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/1redis_pika_ssd/" class="md-nav__link">
+        第一节 基于SSD实现大容量Redis:Pika
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/2redis_locks/" class="md-nav__link">
+        第二节 Redis应对并发访问：无锁的原子操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/3redis_distributed_locks/" class="md-nav__link">
+        第三节 Redis实现分布式锁
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/4redis_acid/" class="md-nav__link">
+        第四节 事务机制 Redis实现ACID属性
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/5redis_perf/" class="md-nav__link">
+        第六章 Redis性能与锁机制以及ACID总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          第七章 Redis Cluster集群介绍及管理
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第七章 Redis Cluster集群介绍及管理" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          第七章 Redis Cluster集群介绍及管理
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/1Redis_master_slave/" class="md-nav__link">
+        第一节 Redis主从同步与故障切换的三个坑
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/2redis_brain_split/" class="md-nav__link">
+        第二节 脑裂导致数据丢失
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/3redis_codis_cluster/" class="md-nav__link">
+        第三节 Redis Codis 集群方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/4redis_spike_sys/" class="md-nav__link">
+        第四节 Redis支撑秒杀场景的关键技术和实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/5redis_data_incline/" class="md-nav__link">
+        第五节 数据分布优化应对数据倾斜
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/6redis_cluster_gossip/" class="md-nav__link">
+        第六节 限制Redis Cluster规模的关键因素:通信开销
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/8Redis_HA/" class="md-nav__link">
+        第七节 Redis 高可用性解决方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/7Redis_cluster_summary/" class="md-nav__link">
+        第七章 Redis Cluster集群介绍及管理
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          第八章 Redis学习与操作
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第八章 Redis学习与操作" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          第八章 Redis学习与操作
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/1redis_6.0_fea/" class="md-nav__link">
+        第一节 Redis 6.0的新特性：多线程、客户端缓存与安全
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/2redis_nvm_mem/" class="md-nav__link">
+        第二节 Redis 基于NVM内存的实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/3redis_RESP/" class="md-nav__link">
+        第三节 Redis客户端如何与服务器端交换命令和数据 RESP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/4redis_opt_tools/" class="md-nav__link">
+        第四节 Redis运维工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/5redis_protocol/" class="md-nav__link">
+        第五节 Redis的使用规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/8redis_keys/" class="md-nav__link">
+        第六节 Redis如何删除数量过万以上Key而不影响业务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/6redis_opt_summary/" class="md-nav__link">
+        第八章 Redis学习与操作总结
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/7redis_shake/" class="md-nav__link">
+        工具补充1：redis-shake数据同步和数据迁移
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          第九章 使用k8s安装Redis集群
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第九章 使用k8s安装Redis集群" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          第九章 使用k8s安装Redis集群
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap9/1redis_k8s_sts/" class="md-nav__link">
+        第一节 Kubernetes上通过sts测试Redis Cluster
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap9/2redis_k8s_config/" class="md-nav__link">
+        第二节 利用ConfigMap设置安装 Redis
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          第十章 期末总结章
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第十章 期末总结章" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          第十章 期末总结章
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/1redis_test/" class="md-nav__link">
+        Redis 核心技术考题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/3Redis_basic/" class="md-nav__link">
+        Redis 基础你掌握多少了？来个查漏补缺
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/2Redis_interview/" class="md-nav__link">
+        40 道Redis面试题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/4Redis_int_all/" class="md-nav__link">
+        115 道 Redis 面试题解答
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/5redis6_int/" class="md-nav__link">
+        Redis6.0与缓存大全基础面试
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    1、章节小结
+  </a>
+  
+    <nav class="md-nav" aria-label="1、章节小结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-redisstring" class="md-nav__link">
+    1-1 Redis的String类型数据结构，及其底层实现
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis" class="md-nav__link">
+    1-2 Redis有那些数据结构适合做统计
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-geolbs" class="md-nav__link">
+    1-3 GEO，一种可以实现LBS服务的数据结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4" class="md-nav__link">
+    1-4 根据时间序列数据的特点，选择合适的存储方案
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-5-redis" class="md-nav__link">
+    1-5 如何使用redis实现消息队列的需求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2、本章操作总结
+  </a>
+  
+    <nav class="md-nav" aria-label="2、本章操作总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-redisstring_1" class="md-nav__link">
+    1-1 Redis的String类型数据结构，及其底层实现
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis_1" class="md-nav__link">
+    1-2 Redis有那些数据结构适合做统计
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-geolbs_1" class="md-nav__link">
+    1-3 GEO，一种可以实现LBS服务的数据结构
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4_1" class="md-nav__link">
+    1-4 根据时间序列数据的特点，选择合适的存储方案
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-5-redis_1" class="md-nav__link">
+    1-5 如何使用redis实现消息队列的需求
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3、章节小问
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/Chao-Xi/jxredisbook.git/edit/master/docs/chap3/6redis_ds_sum.md" title="编辑此页" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="redis"><strong>第三章 Redis 的数据结构</strong></h1>
+<h2 id="1"><strong>1、章节小结</strong></h2>
+<h3 id="1-1-redisstring"><strong>1-1 Redis的String类型数据结构，及其底层实现</strong></h3>
+<ul>
+<li>String 在保存的键值对本身占用的内存空间不大时，String 类型的元数据开销就占据主导了，<strong>这里面包括了 RedisObject 结构、SDS 结构、dictEntry 结构的内存开销</strong>。</li>
+<li>使用压缩列表保存数据。当然，使用 Hash 这种集合类型保存单值键值对的数据时，我们需要将单值数据拆分成两部分，分别作为 Hash 集合的键和值，就像刚才案例中用二级编码来表示图片 ID</li>
+<li>如果你想知道键值对采用不同类型保存时的内存开销，可以在<strong><a href="http://www.redis.cn/redis_memory/">这个网址</a></strong>里输入你的键值对长度和使用的数据类型，这样就能知道实际消耗的内存大小了</li>
+</ul>
+<p><strong>Redis的String类型数据结构，及其底层实现</strong></p>
+<ul>
+<li>Redis的String类型数据结构，及其底层实现</li>
+<li>可以巧妙的利用Redis的底层数据结构特性，降低资源消耗</li>
+<li>Simple Dynamic String结构<ul>
+<li><code>buf</code>：字节数组，保存实际数据。为了表示字节数组的结束，Redis 会自动在数组最后加一个<code>“\0”</code>，这就会额外占用 1 个字节的开销。</li>
+<li>len：占 4 个字节，<strong>表示 buf 的已用长度</strong>。</li>
+<li>alloc：也占个 4 字节，<strong>表示 buf 的实际分配长度，一般大于 len。</strong>           </li>
+</ul>
+</li>
+<li>dicEntry 结构体<ul>
+<li>key：8个字节指针，指向key</li>
+<li>value：8个字节指针，指向value</li>
+<li>next：指向下一个dicEntry</li>
+</ul>
+</li>
+<li>ziplist(压缩列表)（ zlbytes：在表头，表示列表长度  zltail：在表头，表示列尾偏移量 zllen：在表头，表示列表中 entry：保存数据对象模型  zlend：在表尾，表示列表结束）</li>
+<li>entry：<ul>
+<li><code>prev_len</code>：表示一个entry的长度，有两种取值方式：1字节或5字节。</li>
+<li>1字节表示一个entry小于254字节，255是zlend的默认值，所以不使用。</li>
+<li>len：表示自身长度，4字节</li>
+<li>encodeing：表示编码方式，1字节</li>
+<li>content：保存实际数据</li>
+</ul>
+</li>
+<li>String类型的内存空间消耗<ul>
+<li>保存Long类型时，指针直接保存整数数据值，可以节省空间开销（被称为：int编码）</li>
+<li>保存字符串，且不大于44字节时，RedisObject的元数据，指针和SDS是连续的，可以避免内存碎片（被称为：embstr编码）</li>
+<li>当保存的字符串大于44字节时，SDS的数据量变多，Redis会给SDS分配独立的空间，并用指针指向SDS结构（被称为：raw编码）</li>
+<li>Redis使用一个全局哈希表保存所以键值对，哈希表的每一项都是一个dicEntry，每个dicEntry占用32字节空间</li>
+<li>dicEntry自身24字节，但会占用32字节空间，是因为Redis使用了内存分配库jemalloc。</li>
+<li>jemalloc在分配内存时，会根据申请的字节数N，找一个比N大，但最接近N的2的幂次数作为分配空间，这样可以减少频繁分配内存的次数</li>
+</ul>
+</li>
+<li>使用什么数据结构可以节省内存？<ul>
+<li>压缩列表，是一种非常节省内存的数据结构，因为他使用连续的内存空间保存数据，不需要额外的指针进行连接</li>
+<li>Redis基于压缩列表实现List，Hash，Sorted Set集合类型，最大的好处是节省了dicEntry开销</li>
+</ul>
+</li>
+<li>如何使用集合类型保存键值对？<ul>
+<li>Hash类型设置了用压缩列表保存数据时的两个阀值，一旦超过就会将压缩列表转为哈希表，且不可回退</li>
+<li><code>hash-max-ziplist-entries</code>：表示用压缩列表保存哈希集合中的最大元素个数</li>
+<li><code>hash-max-ziplist-value</code>：表示用压缩列表保存时，哈希集合中单个元素的最大长度</li>
+</ul>
+</li>
+</ul>
+<h3 id="1-2-redis"><strong>1-2 Redis有那些数据结构适合做统计</strong></h3>
+<p><img alt="Alt Image Text" src="../../images/chap3_2_4.png" title="Body image" /></p>
+<ul>
+<li>Set 和 Sorted Set 都支持多种聚合统计，不过，对于差集计算来说，只有 Set 支持。Bitmap 也能做多个 Bitmap 间的聚合计算，包括与、或和异或操作。</li>
+<li><strong>当需要进行排序统计时</strong>，List 中的元素虽然有序，但是一旦有新元素插入，原来的元素在 List 中的位置就会移动，那么，按位置读取的排序结果可能就不准确了。而 Sorted Set 本身是按照集合元素的权重排序，可以准确地按序获取结果，所以建议你优先使用它。</li>
+<li>记录的数据只有 0 和 1 两个值的状态，Bitmap 会是一个很好的选择，这主要归功于 Bitmap 对于一个数据只用 1 个 bit 记录，可以节省内存。</li>
+<li>对于基数统计来说，如果集合元素量达到亿级别而且不需要精确统计时，我建议你使用 HyperLogLog。</li>
+</ul>
+<p><strong>重点及亮点</strong></p>
+<ul>
+<li>日常的统计需求可以分为四类：聚合，排序，二值状态，基数，选用适合的数据类型可以实现即快速又节省内存</li>
+<li>聚合统计，可以选用Set类型完成，但Set的差，并，交集操作复杂度高，在数据量大的时候会阻塞主进程</li>
+<li>排序统计，可以选用List和Sorted Set</li>
+<li>二值状态统计：Bitmap本身是用String类型作为底层数据结构实现，String类型会保存为二进制字节数组，所以可以看作是一个bit数组</li>
+<li>基数统计：HyperLogLog ,计算基数所需空间总是固定的，而且很小。但要注意，HyperLogLog是统计规则是基于概率完成的，不是非常准确</li>
+</ul>
+<h3 id="1-3-geolbs"><strong>1-3 GEO，一种可以实现LBS服务的数据结构</strong></h3>
+<p>GEO 本身并没有设计新的底层数据结构，而是直接使用了 Sorted Set 集合类型。</p>
+<ul>
+<li><code>GEO</code> 类型使用 <code>GeoHash</code> 编码方法实现了经纬度到 <code>Sorted Set</code> 中元素权重分数的转换，这其中的两个关键机制就是对二维地图做区间划分，以及对区间进行编码。</li>
+<li>一组经纬度落在某个区间后，就用区间的编码值来表示，并把编码值作为 <code>Sorted Se</code> 元素的权重分数。</li>
+<li>这样一来，我们就可以把经纬度保存到 <code>Sorted Set</code> 中，利用 <code>Sorted Set</code> 提供的“按权重进行有序范围查找”的特性，实现 LBS 服务中频繁使用的“搜索附近”的需求。</li>
+</ul>
+<p>GEO 属于 Redis 提供的扩展数据类型。扩展数据类型有两种实现途径：</p>
+<ul>
+<li>一种是基于现有的数据类型，通过数据编码或是实现新的操作的方式，来实现扩展数据类型，例如基于 Sorted Set 和 GeoHash 编码实现 GEO，以及基于 String 和位操作实现 Bitmap；</li>
+<li>另一种就是开发自定义的数据类型，具体的操作是增加新数据类型的定义，实现创建和释放函数，实现新数据类型支持的命令操作</li>
+</ul>
+<p><strong>要点&amp;亮点？</strong></p>
+<ul>
+<li>GEO的原理，这个是我之前所不知道的，学完后对GEO有了一些认知</li>
+<li>Redis居然支持自定义数据存储结构，这打开了我的眼界</li>
+<li><strong>GEO的底层实现，是sortSet，元素是车辆信息，权重是车辆经纬度转换过来的float值</strong></li>
+<li><strong>GEOHash编码，基本原理“二分区间，区间编码”（二分法的应用，将一个值编码成N位的二进制值）</strong></li>
+<li><strong>GEO使用GEOHash编码后，将经纬度，按照纬奇经偶位分别填充组合，得到一个车辆的经纬度编码值</strong></li>
+<li>GEOHash编码实现的效果是将一个空间分割成为一个个方块，可以实现LBS服务（但编码值相近，不一定位置相近）</li>
+</ul>
+<h3 id="1-4"><strong>1-4 根据时间序列数据的特点，选择合适的存储方案</strong></h3>
+<ul>
+<li>点查询，根据一个时间戳，查询相应时间的数据；</li>
+<li>范围查询，查询起始和截止时间戳范围内的数据；</li>
+<li>聚合计算，针对起始和截止时间戳范围内的所有数据进行计算，例如求最大 / 最小值，求均值等。</li>
+</ul>
+<p>Redis 的高性能写特性足以应对了；而针对多样化的查询需求，Redis 提供了两种方案。</p>
+<p>第一种方案是，组合使用 Redis 内置的 Hash 和 Sorted Set 类型，把数据同时保存在 Hash 集合和 Sorted Set 集合中。</p>
+<p><strong>这种方案既可以利用 <code>Hash</code> 类型实现对单键的快速查询，还能利用 <code>Sorted Set</code> 实现对范围查询的高效支持，一下子满足了时间序列数据的两大查询需求。</strong></p>
+<p><strong>第一种方案也有两个不足</strong></p>
+<ul>
+<li>在执行聚合计算时，我们需要把数据读取到客户端再进行聚合，当有大量数据要聚合时，数据传输开销大；</li>
+<li>所有的数据会在两个数据类型中各保存一份，内存开销不小。<strong>不过，我们可以通过设置适当的数据过期时间，释放内存，减小内存压力</strong>。</li>
+</ul>
+<p><strong>RedisTimeSeries 模块</strong></p>
+<p>这是专门为存取时间序列数据而设计的扩展模块。和第一种方案相比，<code>RedisTimeSeries</code>能支持直接在 Redis 实例上进行多种数据聚合计算，避免了大量数据在实例和客户端间传输。</p>
+<p>不过，<code>RedisTimeSeries</code> 的底层数据结构使用了链表，它的范围查询的复杂度是 O(N) 级别的，同时，它的 <code>TS.GET</code> 查询只能返回最新的数据，没有办法像第一种方案的 <code>Hash</code> 类型一样，可以返回任一时间点的数据。</p>
+<p><strong>组合使用 Hash 和 Sorted Set，或者使用 RedisTimeSeries，在支持时间序列数据存取上各有优劣势</strong></p>
+<ul>
+<li><strong>如果你的部署环境中网络带宽高、Redis 实例内存大，可以优先考虑第一种方案；</strong></li>
+<li><strong>如果你的部署环境中网络、内存资源有限，而且数据量大，聚合计算频繁，需要按数据集合属性查询，可以优先考虑第二种方案。</strong></li>
+</ul>
+<p>使用 <code>Sorted Set</code> 保存时间序列数据，把时间戳作为 <code>score</code>，把实际的数据作为 member，你觉得这样保存数据有没有潜在的风险？另外，如果你是 <code>Redis</code> 的开发维护者，你会把聚合计算也设计为 <code>Sorted Set</code> 的一个内在功能吗？</p>
+<p><strong>存在member重复的问题，会对member覆盖</strong></p>
+<h3 id="1-5-redis"><strong>1-5 如何使用redis实现消息队列的需求</strong></h3>
+<p>分布式系统组件使用消息队列时的三大需求：<strong>消息保序、重复消息处理和消息可靠性保证</strong>，这三大需求可以进一步转换为对消息队列的三大要求：<strong>消息数据有序存取，消息数据具有全局唯一编号，以及消息数据在消费完成后被删除。</strong></p>
+<p><img alt="Alt Image Text" src="../../images/chap3_5_5.png" title="Body image" /></p>
+<p>其实，关于 Redis 是否适合做消息队列，业界一直是有争论的。很多人认为，要使用消息队列，就应该采用 Kafka、RabbitMQ 这些专门面向消息队列场景的软件，而 Redis 更加适合做缓存。</p>
+<p>Redis 是一个非常轻量级的键值数据库，部署一个 Redis 实例就是启动一个进程，部署 Redis 集群，也就是部署多个 Redis 实例。而 Kafka、RabbitMQ 部署时，涉及额外的组件，例如 Kafka 的运行就需要再部署 ZooKeeper。<strong>相比 Redis 来说，Kafka 和 RabbitMQ 一般被认为是重量级的消息队列。</strong></p>
+<p>如果分布式系统中的组件消息通信量不大，那么，Redis 只需要使用有限的内存空间就能满足消息存储的需求，而且，<strong>Redis 的高性能特性能支持快速的消息读写，不失为消息队列的一个好的解决方案。</strong></p>
+<h2 id="2"><strong>2、本章操作总结</strong></h2>
+<h3 id="1-1-redisstring_1"><strong>1-1 Redis的String类型数据结构，及其底层实现</strong></h3>
+<pre><code>127.0.0.1:6379&gt; info memory
+# Memory
+used_memory:1039120
+127.0.0.1:6379&gt; hset 1101000 060 3302000080
+(integer) 1
+127.0.0.1:6379&gt; info memory
+# Memory
+used_memory:1039136
+</code></pre>
+<h3 id="1-2-redis_1"><strong>1-2 Redis有那些数据结构适合做统计</strong></h3>
+<p>我们计算累计用户 Set 和 <code>user:id:20200803 Set</code> 的并集结果，结果保存在 <code>user:id</code> 这个累计用户 Set </p>
+<blockquote>
+<p><strong>统计多个集合的所有元素（并集统计）。</strong></p>
+</blockquote>
+<pre><code>SUNIONSTORE  user:id  user:id  user:id:20200803 
+</code></pre>
+<p>此时，<code>user:id</code> 这个累计用户 Set 中就有了 8 月 3 日的用户 ID。等到 8 月 4 日再统计时，我们把 8 月 4 日登录的用户 ID 记录到 <code>user:id:20200804</code> 的 Set 中。接下来，我们执行 <code>SDIFFSTORE</code> 命令计算累计用户 <code>Set</code> 和 <code>user:id:20200804 Set</code> 的差集，结果保存在 key 为 <code>user:new</code> 的 Set 中，如下所示：</p>
+<blockquote>
+<p><strong>把两个集合相比，统计其中一个集合独有的元素（差集统计）；</strong></p>
+</blockquote>
+<pre><code>SDIFFSTORE  user:new  user:id:20200804 user:id  
+</code></pre>
+<p>以看到，这个差集中的用户 ID 在 <code>user:id:20200804</code> 的 Set 中存在，但是不在累计用户 Set 中。所以，<code>user:new</code> 这个 Set 中记录的就是 8 月 4 日的新增用户。</p>
+<p>当要计算 8 月 4 日的留存用户时，我们只需要再计算 <code>user:id:20200803</code> 和 <code>user:id:20200804</code> 两个 Set 的交集，就可以得到同时在这两个集合中的用户 ID 了，这些就是在 8 月 3 日登录，并且在 8 月 4 日留存的用户。</p>
+<blockquote>
+<p><strong>统计多个集合的共有元素（交集统计）</strong></p>
+</blockquote>
+<pre><code>SINTERSTORE user:id:rem user:id:20200803 user:id:20200804
+</code></pre>
+<p>当你需要对多个集合进行聚合计算时，Set 类型会是一个非常不错的选择</p>
+<p>set类型适合做聚合统计： </p>
+<ul>
+<li><code>SUNIONSTORE</code>:并集 </li>
+<li><code>SDIFFSTORE</code>:差集 </li>
+<li><code>SINTERSTORE</code>:交集</li>
+</ul>
+<p>用 LPUSH 命令把它插入 List 的队头。</p>
+<p>假设当前的评论 List 是{A, B, C, D, E, F}（其中，A 是最新的评论，以此类推，F 是最早的评论），在展示第一页的 3 个评论时，我们可以用下面的命令，得到最新的三条评论 A、B、C：</p>
+<pre><code>LRANGE product1 0 2
+1) &quot;A&quot;
+2) &quot;B&quot;
+3) &quot;C&quot;
+</code></pre>
+<p>然后，再用下面的命令获取第二页的 3 个评论，也就是 D、E、F。</p>
+<pre><code>LRANGE product1 3 5
+1) &quot;D&quot;
+2) &quot;E&quot;
+3) &quot;F&quot;
+</code></pre>
+<p><strong>Sorted Set</strong></p>
+<pre><code>ZRANGEBYSCORE comments N-9 N
+</code></pre>
+<p><strong>Bitmap</strong></p>
+<ul>
+<li>Bitmap 提供了 <code>GETBIT/SETBIT</code> 操作，使用一个偏移值 offset 对 bit 数组的某一个 bit 位进行读和写。</li>
+<li>不过，需要注意的是，Bitmap 的偏移量是从 0 开始算的，也就是说 offset 的最小值是 0。</li>
+<li>当使用 SETBIT 对一个 bit 位进行写操作时，这个 bit 位会被设置为 1。Bitmap 还提供了 BITCOUNT 操作，用来统计这个 bit 数组中所有“1”的个数。</li>
+</ul>
+<p>假设我们要统计 ID 3000 的用户在 2020 年 8 月份的签到情况，就可以按照下面的步骤进行操作。</p>
+<p>第一步，执行下面的命令，记录该用户 8 月 3 号已签到。</p>
+<pre><code>SETBIT uid:sign:3000:202008 2 1 
+</code></pre>
+<p><strong><code>setbit key offset value</code></strong></p>
+<p>第二步，检查该用户 8 月 3 日是否签到。</p>
+<pre><code>GETBIT uid:sign:3000:202008 2 
+</code></pre>
+<p>第三步，统计该用户在 8 月份的签到次数。</p>
+<pre><code>BITCOUNT uid:sign:3000:202008
+</code></pre>
+<p>第三步，统计该用户在 8 月份的签到次数。</p>
+<pre><code>BITCOUNT uid:sign:3000:202008
+</code></pre>
+<p><strong>SADD</strong></p>
+<p>有一个用户 user1 访问 page1 时，你把这个信息加到 Set 中：</p>
+<pre><code>SADD page1:uv user1
+</code></pre>
+<p>当你需要统计 UV 时，可以直接用 SCARD 命令，这个命令会返回一个集合中的元素个数。</p>
+<p><strong>Hash =&gt; HSET</strong></p>
+<p>例如，你可以把用户 ID 作为 Hash 集合的 key，当用户访问页面时，就用 HSET 命令（用于设置 Hash 集合元素的值），对这个用户 ID 记录一个值“1”，表示一个独立访客，用户 1 访问 page1 后，我们就记录为 1 个独立访客，如下所示：</p>
+<pre><code>HSET page1:uv user1 1
+</code></pre>
+<ul>
+<li>即使用户 1 多次访问页面，重复执行这个 <code>HSET</code> 命令，也只会把 user1 的值设置为 1，仍然只记为 1 个独立访客。</li>
+<li>当要统计 UV 时，我们可以用 <code>HLEN</code> 命令统计 Hash 集合中的所有元素个数。</li>
+</ul>
+<p>在统计 UV 时，你可以用 <code>PFADD</code> 命令（用于向 <code>HyperLogLog</code> 中添加新元素）把访问页面的每个用户都添加到 <code>HyperLogLog</code> 中。</p>
+<pre><code>PFADD page1:uv user1 user2 user3 user4 user5
+</code></pre>
+<p><strong>就可以用 <code>PFCOUNT</code> 命令直接获得 <code>page1</code> 的 <code>UV</code> 值了，这个命令的作用就是返回 <code>HyperLogLog</code> 的统计结果。</strong></p>
+<pre><code>PFCOUNT page1:uv
+</code></pre>
+<h3 id="1-3-geolbs_1"><strong>1-3 GEO，一种可以实现LBS服务的数据结构</strong></h3>
+<p><strong>把 ID 号为 33 的车辆的当前经纬度位置存入 GEO 集合中</strong>：</p>
+<pre><code>GEOADD cars:locations 116.034579 39.030452 33
+</code></pre>
+<p>例如，LBS 应用执行下面的命令时，Redis 会根据输入的用户的经纬度信息（116.054579，39.030452 ），<strong>查找以这个经纬度为中心的 5 公里内的车辆信息，并返回给 LBS 应用。当然， 你可以修改“5”这个参数，来返回更大或更小范围内的车辆信息。</strong></p>
+<pre><code>GEORADIUS cars:locations 116.054579 39.030452 5 km ASC COUNT 10
+</code></pre>
+<h3 id="1-4_1"><strong>1-4 根据时间序列数据的特点，选择合适的存储方案</strong></h3>
+<p><strong>Hash 类型保存时间序列</strong></p>
+<p>举个例子。我们用 HGET 命令查询 202008030905 这个时刻的温度值，使用 HMGET 查询 202008030905、202008030907、202008030908 这三个时刻的温度值，如下所示：</p>
+<pre><code>HGET device:temperature 202008030905
+&quot;25.1&quot;
+
+HMGET device:temperature 202008030905 202008030907 202008030908
+1) &quot;25.1&quot;
+2) &quot;25.9&quot;
+3) &quot;24.9&quot;
+</code></pre>
+<p><strong>Sorted Set 来保存时间序列</strong></p>
+<p>使用 Sorted Set 保存数据后，我们就可以使用 <code>ZRANGEBYSCORE</code> 命令，按照输入的最大时间戳和最小时间戳来查询这个时间范围内的温度值了。如下所示，我们来查询一下在 2020 年 8 月 3 日 9 点 7 分到 9 点 10 分间的所有温度值：</p>
+<pre><code>ZRANGEBYSCORE device:temperature 202008030907 202008030910
+1) &quot;25.9&quot;
+2) &quot;24.9&quot;
+3) &quot;25.3&quot;
+4) &quot;25.2&quot;
+</code></pre>
+<p><strong>原子性的操作 MULTI &amp; EXEC</strong></p>
+<p>以保存设备状态信息的需求为例，我们执行下面的代码，把设备在 2020 年 8 月 3 日 9 时 5 分的温度，<strong>分别用 HSET 命令和 ZADD 命令写入 Hash 集合和 Sorted Set 集合</strong>。</p>
+<pre><code>127.0.0.1:6379&gt; MULTI
+OK
+
+127.0.0.1:6379&gt; HSET device:temperature 202008030911 26.8
+QUEUED
+
+127.0.0.1:6379&gt; ZADD device:temperature 202008030911 26.8
+QUEUED
+
+127.0.0.1:6379&gt; EXEC
+1) (integer) 1
+2) (integer) 1
+</code></pre>
+<ul>
+<li>首先，Redis 收到了客户端执行的 MULTI 命令。</li>
+<li>然后，客户端再执行 <code>HSET</code>和 <code>ZADD</code> 命令后，<code>Redis</code> 返回的结果为<code>“QUEUED</code>”，表示这两个命令暂时入队，先不执行；</li>
+<li>执行了 <code>EXEC</code> 命令后，<code>HSET</code> 命令和 <code>ZADD</code> 命令才真正执行，并返回成功结果（结果值为 1）。</li>
+</ul>
+<p><strong>序列数据</strong></p>
+<p>因为 RedisTimeSeries 不属于 Redis 的内建功能模块，在使用时，我们需要先把它的源码单独编译成动态链接库 <code>redistimeseries.so</code>，再使用 <code>loadmodule</code> 命令进行加载，如下所示：</p>
+<pre><code>loadmodule redistimeseries.so
+</code></pre>
+<p>例如，我们执行下面的命令，创建一个 key 为 <code>device:temperature</code>、数据有效期为 600s 的时间序列数据集合。</p>
+<pre><code>TS.CREATE device:temperature RETENTION 600000 LABELS device_id 1
+OK
+</code></pre>
+<p>例如，我们执行下列 <code>TS.ADD</code> 命令时，就往 <code>device:temperature</code> 集合中插入了一条数据，记录的是设备在 2020 年 8 月 3 日 9 时 5 分的设备温度；</p>
+<p>再执行 <code>TS.GET</code> 命令时，就会把刚刚插入的最新数据读取出来</p>
+<pre><code>TS.ADD device:temperature 1596416700 25.1
+1596416700
+
+TS.GET device:temperature 
+25.1
+</code></pre>
+<p>举个例子。假设我们一共用 4 个集合为 4 个设备保存时间序列数据，设备的 ID 号是 1、2、3、4，我们在创建数据集合时，把 <code>device_id</code> 设置为每个集合的标签。</p>
+<p>此时，我们就可以使用下列 <code>TS.MGET</code> 命令，以及 <code>FILTER</code> 设置（这个配置项用来设置集合标签的过滤条件），查询 <code>device_id</code> 不等于<code>2</code> 的所有其他设备的数据集合，并返回各自集合中的最新的一条数据。</p>
+<pre><code>TS.MGET FILTER device_id!=2 
+
+1) 1) &quot;device:temperature:1&quot;
+   2) (empty list or set)
+   3) 1) (integer) 1596417000
+      2) &quot;25.3&quot;
+2) 1) &quot;device:temperature:3&quot;
+   2) (empty list or set)
+   3) 1) (integer) 1596417000
+      2) &quot;29.5&quot;
+3) 1) &quot;device:temperature:4&quot;
+   2) (empty list or set)
+   3) 1) (integer) 1596417000
+      2) &quot;30.1&quot;
+</code></pre>
+<p><code>RedisTimeSeries</code> 支持的聚合计算类型很丰富，包括求均值（avg）、求最大 / 最小值（max/min），求和（sum）等。</p>
+<p>例如，在执行下列命令时，我们就可以按照每 180s 的时间窗口，对 2020 年 8 月 3 日 9 时 5 分和 2020 年 8 月 3 日 9 时 12 分这段时间内的数据进行均值计算了。</p>
+<pre><code>TS.RANGE device:temperature 1596416700 1596417120 AGGREGATION avg 180000
+1) 1) (integer) 1596416700
+   2) &quot;25.6&quot;
+2) 1) (integer) 1596416880
+   2) &quot;25.8&quot;
+3) 1) (integer) 1596417060
+   2) &quot;26.1&quot;
+</code></pre>
+<h3 id="1-5-redis_1"><strong>1-5 如何使用redis实现消息队列的需求</strong></h3>
+<p>List 本身是不会为每个消息生成 ID 号的，所以，消息的全局唯一 ID 号就需要生产者程序在发送消息前自行生成。生成之后，我们在用 LPUSH 命令把消息插入 List 时，需要在消息中包含这个全局唯一 ID。</p>
+<p>例如，我们执行以下命令，就把一条全局 ID 为 <code>101030001</code>、库存量为 5 的消息插入了消息队列：</p>
+<pre><code>LPUSH mq &quot;101030001:stock:5&quot;
+(integer) 1
+</code></pre>
+<p><strong>基于 Streams 的消息队列解决方案</strong></p>
+<ul>
+<li>XADD：插入消息，保证有序，可以自动生成全局唯一 ID；</li>
+<li>XREAD：用于读取消息，可以按 ID 读取数据；</li>
+<li>XREADGROUP：按消费组形式读取消息；</li>
+<li>XPENDING 和 XACK：XPENDING 命令可以用来查询每个消费组内所有消费者已读取但尚未确认的消息，而 XACK 命令用于向消息队列确认消息处理已完成。</li>
+</ul>
+<p>比如说，我们执行下面的命令，就可以往名称为 <code>mqstream</code> 的消息队列中插入一条消息，消息的键是 <code>repo</code>，值是 <code>5</code>。</p>
+<ul>
+<li>其中，消息队列名称后面的<code>*</code>，表示让 Redis 为插入的数据自动生成一个全局唯一的 ID，例如<code>“1599203861727-0”</code>。</li>
+<li>当然，我们也可以不用<code>*</code>，直接在消息队列名称后自行设定一个 ID 号，只要保证这个 ID 号是全局唯一的就行。不过，相比自行设定 ID 号，使用<code>*</code>会更加方便高效。</li>
+</ul>
+<pre><code>XADD mqstream * repo 5
+&quot;1599203861727-0&quot;
+</code></pre>
+<p>例如，我们可以执行下面的命令，从 ID 号为 1599203861727-0 的消息开始，读取后续的所有消息（示例中一共 3 条）。</p>
+<pre><code>
+XREAD BLOCK 100 STREAMS  mqstream 1599203861727-0
+1) 1) &quot;mqstream&quot;
+   2) 1) 1) &quot;1599274912765-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;3&quot;
+      2) 1) &quot;1599274925823-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;2&quot;
+      3) 1) &quot;1599274927910-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;1&quot;
+</code></pre>
+<p><strong><span style="color:red">另外，消费者也可以在调用 XRAED 时设定 block 配置项，实现类似于 BRPOP 的阻塞读取操作。</span></strong></p>
+<p>当消息队列中没有消息时，<strong>一旦设置了 block 配置项，XREAD 就会阻塞，阻塞的时长可以在 block 配置项进行设置。</strong></p>
+<pre><code>XREAD block 10000 streams mqstream $
+(nil)
+(10.00s)
+</code></pre>
+<p>例如，我们执行下面的命令，创建一个名为 group1 的消费组，这个消费组消费的消息队列是 mqstream。</p>
+<pre><code>XGROUP create mqstream group1 0
+OK
+</code></pre>
+<p>然后，我们再执行一段命令，<strong>让 <code>group1</code> 消费组里的消费者 <code>consumer1</code> 从 <code>mqstream</code>中读取所有消息，其中，命令最后的参数<code>“&gt;”</code>，表示从第一条尚未被消费的消息开始读取。</strong></p>
+<p>因为在 <code>consumer1</code> 读取消息前，<code>group1</code> 中没有其他消费者读取过消息，所以，<code>consumer1</code> 就得到 <code>mqstream</code> 消息队列中的所有消息了（一共 4 条）。</p>
+<pre><code>XREADGROUP group group1 consumer1 streams mqstream &gt;
+1) 1) &quot;mqstream&quot;
+   2) 1) 1) &quot;1599203861727-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;5&quot;
+      2) 1) &quot;1599274912765-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;3&quot;
+      3) 1) &quot;1599274925823-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;2&quot;
+      4) 1) &quot;1599274927910-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;1&quot;
+</code></pre>
+<p>比如说，我们执行完刚才的 <code>XREADGROUP</code> 命令后，再执行下面的命令，<strong>让 <code>group1</code> 内的 <code>consumer2</code> 读取消息时，<code>consumer2</code> 读到的就是空值，因为消息已经被 <code>consumer1</code>读取完了</strong>，如下所示：</p>
+<pre><code>XREADGROUP group group1 consumer2  streams mqstream 0
+1) 1) &quot;mqstream&quot;
+   2) (empty list or set)
+</code></pre>
+<p><strong>使用消费组的目的是让组内的多个消费者共同分担读取消息，</strong>所以，我们通常会让每个消费者读取部分消息，从而实现消息读取负载在多个消费者间是均衡分布的。例如，我们执行下列命令，让 group2 中的 consumer1、2、3 各自读取一条消息。</p>
+<pre><code>XREADGROUP group group2 consumer1 count 1 streams mqstream &gt;
+1) 1) &quot;mqstream&quot;
+   2) 1) 1) &quot;1599203861727-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;5&quot;
+
+XREADGROUP group group2 consumer2 count 1 streams mqstream &gt;
+1) 1) &quot;mqstream&quot;
+   2) 1) 1) &quot;1599274912765-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;3&quot;
+
+XREADGROUP group group2 consumer3 count 1 streams mqstream &gt;
+1) 1) &quot;mqstream&quot;
+   2) 1) 1) &quot;1599274925823-0&quot;
+         2) 1) &quot;repo&quot;
+            2) &quot;2&quot;
+</code></pre>
+<p>如果消费者没有成功处理消息，它就不会给 <code>Streams</code> 发送 <code>XACK</code>命令，消息仍然会留存。此时，消费者可以在重启后，用 <code>XPENDING</code> 命令查看已读取、但尚未确认处理完成的消息。</p>
+<pre><code>XPENDING mqstream group2
+1) (integer) 3
+2) &quot;1599203861727-0&quot;
+3) &quot;1599274925823-0&quot;
+4) 1) 1) &quot;consumer1&quot;
+      2) &quot;1&quot;
+   2) 1) &quot;consumer2&quot;
+      2) &quot;1&quot;
+   3) 1) &quot;consumer3&quot;
+      2) &quot;1&quot;
+</code></pre>
+<p>如果我们还需要进一步查看某个消费者具体读取了哪些数据，可以执行下面的命令：</p>
+<pre><code>XPENDING mqstream group2 - + 10 consumer2
+1) 1) &quot;1599274912765-0&quot;
+   2) &quot;consumer2&quot;
+   3) (integer) 513336
+   4) (integer) 1
+</code></pre>
+<p>一旦消息 <code>1599274912765-0</code> 被 <code>consumer2</code> 处理了，<code>consumer2</code> 就可以使用 <code>XACK</code> 命令通知 <code>Streams</code>，然后这条消息就会被删除。当我们再使用 <code>XPENDING</code> 命令查看时，就可以看到，<code>consumer2</code> 已经没有已读取、但尚未确认处理的消息了。</p>
+<pre><code>XACK mqstream group2 1599274912765-0
+(integer) 1
+XPENDING mqstream group2 - + 10 consumer2
+(empty list or set)
+</code></pre>
+<h2 id="3"><strong>3、章节小问</strong></h2>
+<p><strong>1-1 问题：除了 String 类型和 Hash 类型，还有什么类型适合保存图片吗？</strong></p>
+<p>答案：除了 String 和 Hash，我们还可以使用 Sorted Set 类型进行保存。Sorted Set 的元素有 member 值和 score 值，可以像 Hash 那样，使用二级编码进行保存。具体做法是，把图片 ID 的前 7 位作为 Sorted Set 的 key，把图片 ID 的后 3 位作为 member 值，图片存储对象 ID 作为 score 值。</p>
+<p>Sorted Set 中元素较少时，Redis 会使用压缩列表进行存储，可以节省内存空间。不过，和 Hash 不一样，Sorted Set 插入数据时，需要按 score 值的大小排序。当底层结构是压缩列表时，Sorted Set 的插入性能就比不上 Hash。所以，在我们这节课描述的场景中，Sorted Set 类型虽然可以用来保存，但并不是最优选项。</p>
+<p><strong>1-2 4 种典型的统计模式，分别是聚合统计、排序统计、二值状态统计和基数统计，以及它们各自适合的集合类型。你还遇到过其他的统计场景吗？用的是什么集合类型呢？</strong></p>
+<p>使用<code>List+Lua</code> 统计最近 200 个客户的触达率。具体做法是，每个 List 元素表示一个客户，元素值为 0，代表触达；元素值为 1，就代表未触达。在进行统计时，应用程序会把代表客户的元素写入队列中。当需要统计触达率时，就使用 <code>LRANGE key 0 -1</code> 取出全部元素，计算 0 的比例，这个比例就是触达率。</p>
+<p>这个例子需要获取全部元素，不过数据量只有 200 个，不算大，所以，使用 List，在实际应用中也是可以接受的。但是，如果数据量很大，又有其他查询需求的话（例如查询单个元素的触达情况），List 的操作复杂度较高，就不合适了，可以考虑使用 Hash 类型。</p>
+<p><strong>1-3 你在日常的实践过程中，还用过 Redis 的其他数据类型吗？</strong></p>
+<p>5 大基本数据类型，以及 HyperLogLog、Bitmap、GEO，Redis 还有一种数据类型，<strong><span style="color:red">叫作布隆过滤器。它的查询效率很高，经常会用在缓存场景中，可以用来判断数据是否存在缓存中</span></strong>。</p>
+<p><strong>1-4 在用 Sorted Set 保存时间序列数据时，如果把时间戳作为 score，把实际的数据作为 member，这样保存数据有没有潜在的风险？另外，如果你是 Redis 的开发维护者，你会把聚合计算也设计为 Sorted Set 的一个内在功能吗？</strong></p>
+<p>答案：Sorted Set 和 Set 一样，都会对集合中的元素进行去重，也就是说，如果我们往集合中插入的 member 值，和之前已经存在的 member 值一样，那么，原来 member 的 score 就会被新写入的 member 的 score 覆盖。相同 member 的值，在 Sorted Set 中只会保留一个。</p>
+<p>对于时间序列数据来说，这种去重的特性是会带来数据丢失风险的。毕竟，某一时间段内的多个时间序列数据的值可能是相同的。如果我们往 Sorted Set 中写入的数据是在不同时刻产生的，但是写入的时刻不同，Sorted Set 中只会保存一份最近时刻的数据。这样一来，其他时刻的数据就都没有保存下来。</p>
+<p>举个例子，在记录物联网设备的温度时，一个设备一个上午的温度值可能都是 26。在 Sorted Set 中，我们把温度值作为 member，把时间戳作为 score。我们用 ZADD 命令把上午不同时刻的温度值写入 Sorted Set。由于 member 值一样，所以只会把 score 更新为最新时间戳，最后只有一个最新时间戳（例如上午 12 点）下的温度值。这肯定是无法满足保存多个时刻数据的需求的。</p>
+<p>关于是否把聚合计算作为 Sorted Set 的内在功能，考虑到 Redis 的读写功能是由单线程执行，在进行数据读写时，本身就会消耗较多的 CPU 资源，如果再在 Sorted Set 中实现聚合计算，就会进一步增加 CPU 的资源消耗，影响到 Redis 的正常数据读取。所以，如果我是 Redis 的开发维护者，除非对 Redis 的线程模型做修改，比如说在 Redis 中使用额外的线程池做聚合计算，否则，我不会把聚合计算作为 Redis 的内在功能实现的。</p>
+<p><strong>1-5 如果一个生产者发送给消息队列的消息，需要被多个消费者进行读取和处理（例如，一个消息是一条从业务系统采集的数据，既要被消费者 1 读取并进行实时计算，也要被消费者 2 读取并留存到分布式文件系统 HDFS 中，以便后续进行历史查询），你会使用 Redis 的什么数据类型来解决这个问题呢？</strong></p>
+<p>可以使用 Streams 数据类型的消费组，同时消费生产者的数据，这是可以的。但是，有个地方需要注意，如果只是使用一个消费组的话，消费组内的多个消费者在消费消息时是互斥的，换句话说，在一个消费组内，一个消息只能被一个消费者消费。我们希望消息既要被消费者 1 读取，也要被消费者 2 读取，是一个多消费者的需求。所以，如果使用消费组模式，需要让消费者 1 和消费者 2 属于不同的消费组，这样它们就能同时消费了。</p>
+<p>另外，Redis 基于字典和链表数据结构，实现了发布和订阅功能，这个功能可以实现一个消息被多个消费者消费使用，可以满足问题中的场景需求。</p>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="页脚">
+      
+        
+        <a href="../5redis_stream/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 第五节 如何使用redis实现消息队列的需求" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              第五节 如何使用redis实现消息队列的需求
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../chap4/1redis_asyn/" class="md-footer__link md-footer__link--next" aria-label="下一页: 第一节 Redis有哪些可能导致阻塞的操作" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              第一节 Redis有哪些可能导致阻塞的操作
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021-9999 Jacob Xi
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "search": "../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.467223ff.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2229 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Jacob's Redis 技术与实战教程">
+      
+      
+        <meta name="author" content="Jacob Xi">
+      
+      
+      <link rel="icon" href="../../images/logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.2.5">
+    
+    
+      
+        <title>第三节 当redis查询变慢了怎么办？ - Jacob Redis Book</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2d9f7617.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#e92063">
+        
+      
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#redis" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="Jacob Redis Book" class="md-header__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Jacob Redis Book
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              第三节 当redis查询变慢了怎么办？
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="清空当前内容" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Jacob Redis Book" class="md-nav__button md-logo" aria-label="Jacob Redis Book" data-md-component="logo">
+      
+  <img src="../../images/logo.png" alt="logo">
+
+    </a>
+    Jacob Redis Book
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Chao-Xi/jxredisbook.git/" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jxredisbook
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Welcome
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          第一章 Redis介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第一章 Redis介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          第一章 Redis介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap1/1redis_intro/" class="md-nav__link">
+        第一节 Redis 不得不去掌握的关键
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          第二章 Redis基础篇
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第二章 Redis基础篇" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          第二章 Redis基础篇
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/1redis_kv/" class="md-nav__link">
+        第一节 基本架构： 键值数据库
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/2redis_slowquery/" class="md-nav__link">
+        第二节 数据结构：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/3redis_io/" class="md-nav__link">
+        第三节 高性能IO模型：Redis为什么那么快？
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/4redis_aof_log/" class="md-nav__link">
+        第四节 Redis宕机，如何避免数据丢失：AOF日志
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/5redis_rdb_snapshot/" class="md-nav__link">
+        第五节 Redis宕机，Redis如何实现快速恢复RDB
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/6redis_master_slave_replicate/" class="md-nav__link">
+        第六节 数据同步：主从库数据一致
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/7redis_master_rescue/" class="md-nav__link">
+        第七节	哨兵机制：主库不间断服务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/8redis_sentinel/" class="md-nav__link">
+        第八节	哨兵集群：哨兵挂了，主从库切换
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/9redis_slot/" class="md-nav__link">
+        第九节 切片集群：数据增多了，是该加内存还是加实例
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap2/10redis_basic_sum/" class="md-nav__link">
+        第二章 Redis核心技术基础总结篇
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          第三章 Redis数据结构
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第三章 Redis数据结构" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          第三章 Redis数据结构
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/1redis_string/" class="md-nav__link">
+        第一节 Redis的String类型数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/2redis_sets/" class="md-nav__link">
+        第二节 Redis有那些数据结构适合做统计
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/3redis_geo/" class="md-nav__link">
+        第三节 GEO，一种可以实现LBS服务的数据结构
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/4redis_timeseries/" class="md-nav__link">
+        第四节 根据时间序列数据的特点，选择合适的存储方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/5redis_stream/" class="md-nav__link">
+        第五节 如何使用redis实现消息队列的需求
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap3/6redis_ds_sum/" class="md-nav__link">
+        第三章 Redis 的数据结构
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          第四章 Redis性能影响因子
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第四章 Redis性能影响因子" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          第四章 Redis性能影响因子
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1redis_asyn/" class="md-nav__link">
+        第一节 Redis有哪些可能导致阻塞的操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2redis_cpu/" class="md-nav__link">
+        第二节 在多核CPU架构和NUMA架构下对redis进行优化配置
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          第三节 当redis查询变慢了怎么办？
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        第三节 当redis查询变慢了怎么办？
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1redis" class="md-nav__link">
+    1、Redis 真的变慢了吗？
+  </a>
+  
+    <nav class="md-nav" aria-label="1、Redis 真的变慢了吗？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1" class="md-nav__link">
+    1-1 基线性能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis" class="md-nav__link">
+    1-2 网络对 Redis 性能的影响
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-redis" class="md-nav__link">
+    2、如何应对 Redis 变慢？
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3redis" class="md-nav__link">
+    3、Redis 自身操作特性的影响
+  </a>
+  
+    <nav class="md-nav" aria-label="3、Redis 自身操作特性的影响">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1" class="md-nav__link">
+    3-1 慢查询命令
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-key" class="md-nav__link">
+    3-2 过期 key 操作
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4、文件系统和操作系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5aof" class="md-nav__link">
+    5、文件系统：AOF 模式
+  </a>
+  
+    <nav class="md-nav" aria-label="5、文件系统：AOF 模式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1-everysec" class="md-nav__link">
+    5-1 everysec
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2-always" class="md-nav__link">
+    5-2 always
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3-aof" class="md-nav__link">
+    5-3 AOF 重写
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6swap" class="md-nav__link">
+    6、操作系统：swap
+  </a>
+  
+    <nav class="md-nav" aria-label="6、操作系统：swap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1-swap" class="md-nav__link">
+    6-1 swap 而导致性能降低
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    7、操作系统：内存大页
+  </a>
+  
+    <nav class="md-nav" aria-label="7、操作系统：内存大页">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-trade-off" class="md-nav__link">
+    7-1 内存大页 trade-off
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2" class="md-nav__link">
+    7-2 关闭内存大页
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    本节小结
+  </a>
+  
+    <nav class="md-nav" aria-label="本节小结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redis_1" class="md-nav__link">
+    分析、排查、解决Redis变慢问题
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    要点&amp;亮点
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4redis_fragmentation/" class="md-nav__link">
+        第四节 删除数据后，内存占用率还是很高
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../5redis_buffer/" class="md-nav__link">
+        第五节 Redis缓冲区
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../6redis_slow_respone/" class="md-nav__link">
+        第四章 Redis 影响性能的潜在因素
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          第五章 Redis缓存介绍
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第五章 Redis缓存介绍" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          第五章 Redis缓存介绍
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/1redis_cache/" class="md-nav__link">
+        第一节 Redis 旁路缓存
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/2redis_cache_full/" class="md-nav__link">
+        第二节 缓存满后的替换策略
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/3redis_mysql_uncon/" class="md-nav__link">
+        第三节 如何解决缓存和数据库的数据不一致的缓存异常
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/4redis_contamination/" class="md-nav__link">
+        第四节 缓存被污染的解决问题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap5/5redis_cache_summary/" class="md-nav__link">
+        第五章 Redis 缓存总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_7" type="checkbox" id="__nav_7" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_7">
+          第六章 Redis性能与锁机制以及ACID
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第六章 Redis性能与锁机制以及ACID" data-md-level="1">
+        <label class="md-nav__title" for="__nav_7">
+          <span class="md-nav__icon md-icon"></span>
+          第六章 Redis性能与锁机制以及ACID
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/1redis_pika_ssd/" class="md-nav__link">
+        第一节 基于SSD实现大容量Redis:Pika
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/2redis_locks/" class="md-nav__link">
+        第二节 Redis应对并发访问：无锁的原子操作
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/3redis_distributed_locks/" class="md-nav__link">
+        第三节 Redis实现分布式锁
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/4redis_acid/" class="md-nav__link">
+        第四节 事务机制 Redis实现ACID属性
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap6/5redis_perf/" class="md-nav__link">
+        第六章 Redis性能与锁机制以及ACID总结
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_8" type="checkbox" id="__nav_8" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_8">
+          第七章 Redis Cluster集群介绍及管理
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第七章 Redis Cluster集群介绍及管理" data-md-level="1">
+        <label class="md-nav__title" for="__nav_8">
+          <span class="md-nav__icon md-icon"></span>
+          第七章 Redis Cluster集群介绍及管理
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/1Redis_master_slave/" class="md-nav__link">
+        第一节 Redis主从同步与故障切换的三个坑
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/2redis_brain_split/" class="md-nav__link">
+        第二节 脑裂导致数据丢失
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/3redis_codis_cluster/" class="md-nav__link">
+        第三节 Redis Codis 集群方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/4redis_spike_sys/" class="md-nav__link">
+        第四节 Redis支撑秒杀场景的关键技术和实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/5redis_data_incline/" class="md-nav__link">
+        第五节 数据分布优化应对数据倾斜
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/6redis_cluster_gossip/" class="md-nav__link">
+        第六节 限制Redis Cluster规模的关键因素:通信开销
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/8Redis_HA/" class="md-nav__link">
+        第七节 Redis 高可用性解决方案
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap7/7Redis_cluster_summary/" class="md-nav__link">
+        第七章 Redis Cluster集群介绍及管理
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          第八章 Redis学习与操作
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第八章 Redis学习与操作" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          第八章 Redis学习与操作
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/1redis_6.0_fea/" class="md-nav__link">
+        第一节 Redis 6.0的新特性：多线程、客户端缓存与安全
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/2redis_nvm_mem/" class="md-nav__link">
+        第二节 Redis 基于NVM内存的实践
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/3redis_RESP/" class="md-nav__link">
+        第三节 Redis客户端如何与服务器端交换命令和数据 RESP
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/4redis_opt_tools/" class="md-nav__link">
+        第四节 Redis运维工具
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/5redis_protocol/" class="md-nav__link">
+        第五节 Redis的使用规范
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/8redis_keys/" class="md-nav__link">
+        第六节 Redis如何删除数量过万以上Key而不影响业务
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/6redis_opt_summary/" class="md-nav__link">
+        第八章 Redis学习与操作总结
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap8/7redis_shake/" class="md-nav__link">
+        工具补充1：redis-shake数据同步和数据迁移
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_10" type="checkbox" id="__nav_10" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_10">
+          第九章 使用k8s安装Redis集群
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第九章 使用k8s安装Redis集群" data-md-level="1">
+        <label class="md-nav__title" for="__nav_10">
+          <span class="md-nav__icon md-icon"></span>
+          第九章 使用k8s安装Redis集群
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap9/1redis_k8s_sts/" class="md-nav__link">
+        第一节 Kubernetes上通过sts测试Redis Cluster
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap9/2redis_k8s_config/" class="md-nav__link">
+        第二节 利用ConfigMap设置安装 Redis
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          第十章 期末总结章
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="第十章 期末总结章" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          第十章 期末总结章
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/1redis_test/" class="md-nav__link">
+        Redis 核心技术考题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/3Redis_basic/" class="md-nav__link">
+        Redis 基础你掌握多少了？来个查漏补缺
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/2Redis_interview/" class="md-nav__link">
+        40 道Redis面试题
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/4Redis_int_all/" class="md-nav__link">
+        115 道 Redis 面试题解答
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../chap10/5redis6_int/" class="md-nav__link">
+        Redis6.0与缓存大全基础面试
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1redis" class="md-nav__link">
+    1、Redis 真的变慢了吗？
+  </a>
+  
+    <nav class="md-nav" aria-label="1、Redis 真的变慢了吗？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1" class="md-nav__link">
+    1-1 基线性能
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-redis" class="md-nav__link">
+    1-2 网络对 Redis 性能的影响
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-redis" class="md-nav__link">
+    2、如何应对 Redis 变慢？
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3redis" class="md-nav__link">
+    3、Redis 自身操作特性的影响
+  </a>
+  
+    <nav class="md-nav" aria-label="3、Redis 自身操作特性的影响">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1" class="md-nav__link">
+    3-1 慢查询命令
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-key" class="md-nav__link">
+    3-2 过期 key 操作
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    4、文件系统和操作系统
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5aof" class="md-nav__link">
+    5、文件系统：AOF 模式
+  </a>
+  
+    <nav class="md-nav" aria-label="5、文件系统：AOF 模式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1-everysec" class="md-nav__link">
+    5-1 everysec
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2-always" class="md-nav__link">
+    5-2 always
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3-aof" class="md-nav__link">
+    5-3 AOF 重写
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6swap" class="md-nav__link">
+    6、操作系统：swap
+  </a>
+  
+    <nav class="md-nav" aria-label="6、操作系统：swap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1-swap" class="md-nav__link">
+    6-1 swap 而导致性能降低
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    7、操作系统：内存大页
+  </a>
+  
+    <nav class="md-nav" aria-label="7、操作系统：内存大页">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-trade-off" class="md-nav__link">
+    7-1 内存大页 trade-off
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2" class="md-nav__link">
+    7-2 关闭内存大页
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    本节小结
+  </a>
+  
+    <nav class="md-nav" aria-label="本节小结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#redis_1" class="md-nav__link">
+    分析、排查、解决Redis变慢问题
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    要点&amp;亮点
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+<a href="https://github.com/Chao-Xi/jxredisbook.git/edit/master/docs/chap4/3redis_response.md" title="编辑此页" class="md-content__button md-icon">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+</a>
+
+
+
+<h1 id="redis"><strong>第三节 当redis查询变慢了怎么办？</strong></h1>
+<p>在实际生产环境中，Redis 往往是业务系统中的一个环节（例如作为缓存或是作为数据库）。一旦 Redis 上的请求延迟增加，就可能引起业务系统中的一串儿“连锁反应”。</p>
+<p>应用服务器（App Server）要完成一个事务性操作，<strong>包括在 MySQL 上执行一个写事务，在 Redis 上插入一个标记位，并通过一个第三方服务给用户发送一条完成消息</strong>。</p>
+<p>这三个操作都需要保证事务原子性，所以，如果此时 Redis 的延迟增加，就会拖累 App Server 端整个事务的执行。<strong>这个事务一直完成不了，又会导致 MySQL 上写事务占用的资源无法释放，进而导致访问 MySQL 的其他请求被阻塞。</strong>很明显，Redis 变慢会带来严重的连锁反应。</p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_0.png" title="Body image" /></p>
+<h2 id="1redis"><strong>1、Redis 真的变慢了吗？</strong></h2>
+<p>一个最直接的方法，就是<strong>查看 Redis 的响应延迟。</strong></p>
+<p>大部分时候，Redis 延迟很低，但是在某些时刻，有些 Redis 实例会出现很高的响应延迟，<strong>甚至能达到几秒到十几秒，不过持续时间不长，这也叫延迟“毛刺”</strong>。</p>
+<p>当你发现 Redis 命令的执行时间突然就增长到了几秒，基本就可以认定 Redis 变慢了。</p>
+<p>大部分时候，Redis 延迟很低，但是在某些时刻，有些 Redis 实例会出现很高的响应延迟，甚至能达到几秒到十几秒，不过持续时间不长，这也叫延迟“毛刺”。当你发现 Redis 命令的执行时间突然就增长到了几秒，基本就可以认定 Redis 变慢了。</p>
+<p>这种方法是看 Redis 延迟的绝对值，但是，在不同的软硬件环境下，Redis 本身的绝对性能并不相同。</p>
+<p>比如，在我的环境中，当延迟为 1ms 时，我判定 Redis 变慢了，但是你的硬件配置高，那么，在你的运行环境下，可能延迟是 0.2ms 的时候，你就可以认定 Redis 变慢了。</p>
+<h3 id="1-1"><strong>1-1 基线性能</strong></h3>
+<p><strong><span style="color:red">基于当前环境下的 Redis 基线性能做判断</span></strong></p>
+<p><strong>所谓的基线性能呢，也就是一个系统在低压力、无干扰下的基本性能，这个性能只由当前的软硬件配置决定。</strong></p>
+<p>实际上，从 2.8.7 版本开始，<code>redis-cli</code> 命令提供了<code>–intrinsic-latency</code> 选项，可以用来监测和统计测试期间内的最大延迟，这个延迟可以作为 Redis 的基线性能。其中，测试时长可以用<code>–intrinsic-latency</code>选项的参数来指定。</p>
+<p>举个例子，比如说，我们运行下面的命令，该命令会打印 120 秒内监测到的最大延迟。可以看到，这里的最大延迟是 119 微秒，也就是基线性能为 119 微秒。一般情况下，运行 120 秒就足够监测到最大延迟了，所以，我们可以把参数设置为 120。</p>
+<pre><code>./redis-cli --intrinsic-latency 120
+Max latency so far: 17 microseconds.
+Max latency so far: 44 microseconds.
+Max latency so far: 94 microseconds.
+Max latency so far: 110 microseconds.
+Max latency so far: 119 microseconds.
+
+36481658 total runs (avg latency: 3.2893 microseconds / 3289.32 nanoseconds per run).
+Worst run took 36x longer than the average latency.
+</code></pre>
+<p>需要注意的是，基线性能和当前的操作系统、硬件配置相关。<strong>因此，我们可以把它和 Redis 运行时的延迟结合起来，再进一步判断 Redis 性能是否变慢了</strong>。</p>
+<p><strong><span style="color:red">一般来说，你要把运行时延迟和基线性能进行对比，如果你观察到的 Redis 运行时延迟是其基线性能的 2 倍及以上，就可以认定 Redis 变慢了。</span></strong></p>
+<p>判断基线性能这一点，对于在虚拟化环境下运行的 Redis 来说，非常重要。</p>
+<p>是因为，在虚拟化环境（例如虚拟机或容器）中，由于增加了虚拟化软件层，与物理机相比，<strong>虚拟机或容器本身就会引入一定的性能开销，所以基线性能会高一些</strong>。下面的测试结果，显示的就是某一个虚拟机上运行 Redis 时测的基线性能。</p>
+<pre><code>$ ./redis-cli --intrinsic-latency 120
+Max latency so far: 692 microseconds.
+Max latency so far: 915 microseconds.
+Max latency so far: 2193 microseconds.
+Max latency so far: 9343 microseconds.
+Max latency so far: 9871 microseconds.
+</code></pre>
+<p>可以看到，由于虚拟化软件本身的开销，此时的基线性能已经达到了 9.871ms。</p>
+<p>如果该 Redis 实例的运行时延迟为 10ms，这并不能算作性能变慢，因为此时，运行时延迟只比基线性能增加了 1.3%。<strong>如果你不了解基线性能，一看到较高的运行时延迟，就很有可能误判 Redis 变慢了。</strong></p>
+<p>我们通常是通过客户端和网络访问 Redis 服务，为了避免网络对基线性能的影响，刚刚说的这个命令需要在服务器端直接运行，这也就是说，<strong>我们只考虑服务器端软硬件环境的影响</strong>。</p>
+<h3 id="1-2-redis"><strong>1-2 网络对 Redis 性能的影响</strong></h3>
+<p>如果你想了解网络对 Redis 性能的影响，一个简单的方法是用 <code>iPerf</code> 这样的工具，测量从 Redis 客户端到服务器端的网络延迟。</p>
+<p><strong>如果这个延迟有几十毫秒甚至是几百毫秒，就说明，Redis 运行的网络环境中很可能有大流量的其他应用程序在运行</strong>，导致网络拥塞了。</p>
+<p>这个时候，你就需要协调网络运维，调整网络的流量分配了。</p>
+<h2 id="2-redis"><strong>2、如何应对 Redis 变慢？</strong></h2>
+<p>Redis 架构图，是 <strong>Redis 自身的操作特性、文件系统和操作系统，它们是影响 Redis 性能的三大要素。</strong></p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_1.png" title="Body image" /></p>
+<h2 id="3redis"><strong>3、Redis 自身操作特性的影响</strong></h2>
+<h3 id="3-1"><strong>3-1 慢查询命令</strong></h3>
+<p>慢查询命令，就是指在 Redis 中执行速度慢的命令，这会导致 Redis 延迟增加。Redis 提供的命令操作很多，并不是所有命令都慢，这和命令操作的复杂度有关。</p>
+<p>所以，我们必须要知道 Redis 的不同命令的复杂度。</p>
+<p>比如说，<code>Value</code> 类型为<code>String</code> 时，<code>GET/SET</code> 操作主要就是操作 Redis 的哈希表索引。这个操作复杂度基本是固定的，即 <code>O(1)</code>。</p>
+<p>但是，当 Value 类型为 Set 时，<code>SORT</code>、<code>SUNION/SMEMBERS</code> 操作复杂度分别为 <code>O(N+M*log(M))</code>和 <code>O(N)</code>。其中，N 为 Set 中的元素个数，M 为 SORT 操作返回的元素个数。这个复杂度就增加了很多</p>
+<p><a href="https://redis.io/commands/">Redis 官方文档中对每个命令的复杂度都有介绍</a></p>
+<p><strong>你发现 Redis 性能变慢时，可以通过 Redis 日志，或者是 <code>latency monitor 工具</code>，查询变慢的请求，</strong>根据请求对应的具体命令以及官方文档，确认下是否采用了复杂度高的慢查询命令。</p>
+<p><strong><span style="color:red">如果的确有大量的慢查询命令，有两种处理方式：</span></strong></p>
+<ul>
+<li>用其他高效命令代替。比如说，如果你需要返回一个 SET 中的所有成员时，<strong>不要使用 <code>SMEMBERS</code> 命令，而是要使用 <code>SSCAN</code> 多次迭代返回</strong>，避免一次返回大量数据，造成线程阻塞。</li>
+<li><strong><span style="color:red">当你需要执行排序、交集、并集操作时，可以在客户端完成，而不要用 SORT、SUNION、SINTER 这些命令，以免拖慢 Redis 实例。</span></strong></li>
+</ul>
+<p>当然，如果业务逻辑就是要求使用慢查询命令，那你得考虑采用性能更好的 CPU，更快地完成查询命令，避免慢查询的影响。</p>
+<p>还有一个比较容易忽略的慢查询命令，就是 <code>KEYS</code>。<strong>它用于返回和输入模式匹配的所有 key，例如，以下命令返回所有包含“name”字符串的 keys。</strong></p>
+<pre><code>redis&gt; KEYS *name*
+1) &quot;lastname&quot;
+2) &quot;firstname&quot;
+</code></pre>
+<p><strong><span style="color:red">因为 KEYS 命令需要遍历存储的键值对，所以操作延时高。如果你不了解它的实现而使用了它，就会导致 Redis 性能变慢。所以，KEYS 命令一般不被建议用于生产环境中。</span></strong></p>
+<h3 id="3-2-key"><strong>3-2 过期 key 操作</strong></h3>
+<p><strong>过期 key 的自动删除机制。它是 Redis 用来回收内存空间的常用机制</strong>，应用广泛，本身就会引起 Redis 操作阻塞，导致性能变慢，所以，你必须要知道该机制对性能的影响。</p>
+<p><strong>Redis 键值对的 key 可以设置过期时间。</strong></p>
+<p><span style="color:red">默认情况下，Redis 每 100 毫秒会删除一些过期 key</span>，具体的算法如下：</p>
+<ol>
+<li>采样 <code>ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP</code> 个数的 key，并将其中过期的 key 全部删除；</li>
+<li>如果超过 25% 的 key 过期了，则重复删除的过程，直到过期 key 的比例降至 25% 以下。</li>
+</ol>
+<p><strong><code>ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP</code> 是 Redis 的一个参数，默认是 20</strong>，那么，一秒内基本有 <code>200</code> 个过期 key 会被删除。</p>
+<p><strong>这一策略对清除过期 key、释放内存空间很有帮助。如果每秒钟删除 200 个过期 key，并不会对 Redis 造成太大影响。</strong></p>
+<p><strong>如果触发了上面这个算法的第二条，Redis 就会一直删除以释放内存空间</strong>。</p>
+<p>注意，删除操作是阻塞的（Redis 4.0 后可以用异步线程机制来减少阻塞影响）。所以，一旦该条件触发，Redis 的线程就会一直执行删除，这样一来，就没办法正常服务其他的键值操作了，就会进一步引起其他键值操作的延迟增加，Redis 就会变慢。</p>
+<p>算法的第二条是怎么被触发的呢？</p>
+<p>其中一个重要来源，<strong>就是频繁使用带有相同时间参数的 <code>EXPIREAT</code> 命令设置过期 key，这就会导致，在同一秒内有大量的 key 同时过期</strong>。</p>
+<p>要检查业务代码在使用 EXPIREAT 命令设置 key 过期时间时，是否使用了相同的 UNIX 时间戳，有没有使用 EXPIRE 命令给批量的 key 设置相同的过期秒数。因为，这都会造成大量 key 在同一时间过期，导致性能变慢</p>
+<ul>
+<li>首先要根据实际业务的使用需求，决定 <code>EXPIREAT</code> 和<code>EXPIRE</code> 的过期时间参数。</li>
+<li>其次，如果一批 key 的确是同时过期，你还可以在 <code>EXPIREAT</code> 和 <code>EXPIRE</code> 的过期时间参数上，<strong>加上一个一定大小范围内的随机数</strong>，这样，既保证了 key 在一个邻近时间范围内被删除，又避免了同时过期造成的压力。</li>
+</ul>
+<h2 id="4"><strong>4、文件系统和操作系统</strong></h2>
+<p><strong>Redis 会持久化保存数据到磁盘，这个过程要依赖文件系统来完成，所以，文件系统将数据写回磁盘的机制，会直接影响到 Redis 持久化的效率</strong>。</p>
+<p>而且，在持久化的过程中，Redis 也还在接收其他请求，持久化的效率高低又会影响到 Redis 处理请求的性能。</p>
+<p>另一方面，<strong>Redis 是内存数据库，内存操作非常频繁</strong>，所以，操作系统的内存机制会直接影响到 Redis 的处理效率。比如说，如果 Redis 的内存不够用了，操作系统会启动 swap 机制，这就会直接拖慢 Redis。</p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_1.png" title="Body image" /></p>
+<h2 id="5aof"><strong>5、文件系统：AOF 模式</strong></h2>
+<p>Redis 是个内存数据库，为什么它的性能还和文件系统有关呢？</p>
+<p>为了保证数据可靠性，Redis 会采用 AOF 日志或 RDB 快照。</p>
+<p>其中，AOF 日志提供了三种日志写回策略：<strong>no、everysec、always。这三种写回策略依赖文件系统的两个系统调用完成，也就是 write 和 fsync。</strong></p>
+<ul>
+<li>write 只要把日志记录写到内核缓冲区，就可以返回了，并不需要等待日志实际写回到磁盘；</li>
+<li>而 fsync 需要把日志记录写回到磁盘后才能返回，时间较长。</li>
+</ul>
+<p>下面这张表展示了三种写回策略所执行的系统调用。</p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_2.png" title="Body image" /></p>
+<p>当写回策略配置为 everysec 和 always 时，Redis 需要调用 fsync 把日志写回磁盘。</p>
+<h3 id="5-1-everysec"><strong>5-1 everysec</strong></h3>
+<p>在使用 everysec 时，Redis 允许丢失一秒的操作记录，所以，Redis 主线程并不需要确保每个操作记录日志都写回磁盘。</p>
+<p>而且，fsync 的执行时间很长，如果是在 Redis 主线程中执行 fsync，就容易阻塞主线程。<strong>所以，当写回策略配置为 everysec 时，Redis 会使用后台的子线程异步完成 fsync 的操作。</strong></p>
+<h3 id="5-2-always"><strong>5-2 always</strong></h3>
+<p>而对于 always 策略来说，Redis 需要确保每个操作记录日志都写回磁盘，如果用后台子线程异步完成，主线程就无法及时地知道每个操作是否已经完成了，这就不符合 always 策略的要求了。</p>
+<p><strong>所以，always 策略并不使用后台子线程来执行。</strong></p>
+<blockquote>
+<p><strong>使用everysec时，会使用子线程来操作，不会阻塞主线程。而使用always时，是使用主线程来操作，所以会阻塞主线程</strong></p>
+</blockquote>
+<h3 id="5-3-aof"><strong>5-3 AOF 重写</strong></h3>
+<p>在使用 AOF 日志时，为了避免日志文件不断增大，<strong>Redis 会执行 AOF 重写，生成体量缩小的新的 AOF 日志文件</strong>。AOF 重写本身需要的时间很长，也容易阻塞 Redis 主线程，所以，Redis 使用子进程来进行 AOF 重写。</p>
+<p>潜在的风险点:  <strong><span style="color:red">AOF 重写会对磁盘进行大量 IO 操作，同时，fsync 又需要等到数据写到磁盘后才能返回，所以，当 AOF 重写的压力比较大时，就会导致 fsync 被阻塞。虽然 fsync 是由后台子线程负责执行的，但是，主线程会监控 fsync 的执行进度。</span></strong></p>
+<p>当主线程使用后台子线程执行了一次 fsync，需要再次把新接收的操作记录写回磁盘时，如果主线程发现上一次的 fsync 还没有执行完，那么它就会阻塞。</p>
+<p><strong>所以，如果后台子线程执行的 fsync 频繁阻塞的话（比如 AOF 重写占用了大量的磁盘 IO 带宽），主线程也会阻塞，导致 Redis 性能变慢。</strong></p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_3.png" title="Body image" /></p>
+<p><strong>由于 <code>fsync</code> 后台子线程和 <code>AOF</code> 重写子进程的存在，主 <code>IO</code> 线程一般不会被阻塞。</strong></p>
+<p>但是，如果在重写日志时，<code>AOF</code> 重写子进程的写入量比较大，<code>fsync</code> 线程也会被阻塞，进而阻塞主线程，导致延迟增加</p>
+<p>首先，你可以检查下 Redis 配置文件中的 <code>appendfsync</code> 配置项，该配置项的取值表明了 <code>Redis</code> 实例使用的是哪种 <code>AOF</code> 日志写回策略，如下所示：</p>
+<p><img alt="Alt Image Text" src="../../images/chap4_3_4.png" title="Body image" /></p>
+<p>如果 <code>AOF</code> 写回策略使用了 <code>everysec</code> 或 <code>always</code> 配置，请先确认下业务方对数据可靠性的要求，明确是否需要每一秒或每一个操作都记日志。</p>
+<p><strong>有的业务方不了解 Redis AOF 机制，很可能就直接使用数据可靠性最高等级的 always 配置了。其实，在有些场景中（例如 Redis 用于缓存），数据丢了还可以从后端数据库中获取，并不需要很高的数据可靠性。</strong></p>
+<p>如果业务应用对延迟非常敏感，但同时允许一定量的数据丢失，那么，可以把配置项 <code>no-appendfsync-on-rewrite</code> 设置为 <code>yes</code>，如下所示：</p>
+<pre><code>no-appendfsync-on-rewrite yes
+</code></pre>
+<p><strong><span style="color:red">这个配置项设置为 <code>yes</code> 时，表示在 <code>AOF</code> 重写时，不进行 <code>fsync</code> 操作。也就是说，Redis 实例把写命令写到内存后，不调用后台线程进行 fsync 操作，就可以直接返回了。</span></strong></p>
+<p>当然，如果此时实例发生宕机，就会导致数据丢失。反之，如果这个配置项设置为 no（也是默认配置），在 AOF 重写时，Redis 实例仍然会调用后台线程进行 fsync 操作，这就会给实例带来阻塞。</p>
+<p><strong>如果的确需要高性能，采用高速的固态硬盘作为 AOF 日志的写入设备。</strong></p>
+<p>高速固态盘的带宽和并发度比传统的机械硬盘的要高出 10 倍及以上。</p>
+<p>在 AOF 重写和 fsync 后台线程同时执行时，固态硬盘可以提供较为充足的磁盘 IO 资源，让 AOF 重写和 fsync 后台线程的磁盘 IO 资源竞争减少，从而降低对 Redis 的性能影响。</p>
+<h2 id="6swap"><strong>6、操作系统：swap</strong></h2>
+<p>如果 Redis 的 AOF 日志配置只是 no，或者就没有采用 AOF 模式</p>
+<p><strong>潜在的瓶颈：操作系统的内存 swap。</strong></p>
+<p><strong>内存 swap 是操作系统里将内存数据在内存和磁盘间来回换入和换出的机制，涉及到磁盘的读写</strong>，所以，一旦触发 swap，无论是被换入数据的进程，还是被换出数据的进程，其性能都会受到慢速磁盘读写的影响。</p>
+<p>Redis 是内存数据库，内存使用量大，如果没有控制好内存的使用量，或者和其他内存需求大的应用一起运行了，就可能受到 swap 的影响，而导致性能变慢。</p>
+<p>Redis 内存数据库而言，显得更为重要：<strong>正常情况下，Redis 的操作是直接通过访问内存就能完成，一旦 swap 被触发了，Redis 的请求操作需要等到磁盘数据读写完成才行</strong>。</p>
+<p>而且， AOF 日志文件读写使用 fsync 线程不同，swap 触发后影响的是 Redis 主 IO 线程，这会极大地增加 Redis 的响应时间。</p>
+<h3 id="6-1-swap"><strong>6-1 swap 而导致性能降低</strong></h3>
+<p>实例完成 5000 万个 GET 请求时需要 300s，但是，有一次，这个实例完成 5000 万 GET 请求，花了将近 4 个小时的时间</p>
+<p>问题复现，当时 Redis 处理请求用了近 4 小时的情况下，<strong>该实例所在的机器已经发生了 swap</strong>。从 300s 到 4 个小时，延迟增加了将近 48 倍，可以看到 swap 对性能造成的严重影响。</p>
+<p>什么时候会触发 swap 呢？</p>
+<p><strong>通常，触发 swap 的原因主要是物理机器内存不足</strong>对于 Redis 而言，有两种常见的情况：</p>
+<ul>
+<li>Redis 实例自身使用了大量的内存，导致物理机器的可用内存不足；</li>
+<li>和 Redis 实例在同一台机器上运行的<strong>其他进程，在进行大量的文件读写操作</strong>。文件读写本身会占用系统内存，这会导致分配给 Redis 实例的内存量变少，<strong>进而触发 Redis 发生 swap</strong>。</li>
+</ul>
+<p><strong><span style="color:red">解决思路：增加机器的内存或者使用 Redis 集群</span></strong></p>
+<p>操作系统本身会在后台记录每个进程的 swap 使用情况，即有多少数据量发生了 swap。你可以先通过下面的命令查看 Redis 的进程号，这里是 5332。</p>
+<pre><code>$ redis-cli info | grep process_id
+process_id: 5332
+</code></pre>
+<p>然后，进入 Redis 所在机器的 <code>/proc</code> 目录下的该进程目录中：</p>
+<pre><code>$ cd /proc/5332
+</code></pre>
+<p>最后，运行下面的命令，查看该 Redis 进程的使用情况。</p>
+<pre><code>$cat smaps | egrep '^(Swap|Size)'
+Size: 584 kB
+Swap: 0 kB
+Size: 4 kB
+Swap: 4 kB
+Size: 4 kB
+Swap: 0 kB
+Size: 462044 kB
+Swap: 462008 kB
+Size: 21392 kB
+Swap: 0 kB
+</code></pre>
+<p>每一行 Size 表示的是 Redis 实例所用的一块内存大小，而 Size 下方的 Swap 和它相对应，表示这块 Size 大小的内存区域有多少已经被换出到磁盘上了。<strong>如果这两个值相等，就表示这块内存区域已经完全被换出到磁盘了。</strong></p>
+<ul>
+<li><strong>作为内存数据库，Redis 本身会使用很多大小不一的内存块</strong>，所以，你可以看到有很多 Size 行，有的很小，就是 4KB，而有的很大，例如 462044KB。</li>
+<li><strong>不同内存块被换出到磁盘上的大小也不一样</strong>，例如刚刚的结果中的第一个 4KB 内存块，它下方的 Swap 也是 4KB，这表示这个内存块已经被换出了；</li>
+<li>另外，462044KB 这个内存块也被换出了 462008KB，差不多有 462MB。</li>
+</ul>
+<p>当出现百 MB，甚至 GB 级别的 swap 大小时，就表明，此时，Redis 实例的内存压力很大，很有可能会变慢。所以，swap 的大小是排查 Redis 性能变慢是否由 swap 引起的重要指标。</p>
+<p>一旦发生内存 swap， <strong><span style="color:red">最直接的解决方法就是增加机器内存</span></strong>。</p>
+<p>如果该实例在一个 Redis 切片集群中，可以增加 Redis 集群的实例个数，来分摊每个实例服务的数据量，进而减少每个实例所需的内存量。</p>
+<p>如果 Redis 实例和其他操作大量文件的程序（例如数据分析程序）共享机器，你可以将 Redis 实例迁移到单独的机器上运行，以满足它的内存需求量。如果该实例正好是 Redis 主从集群中的主库，而从库的内存很大，也可以考虑进行主从切换，把大内存的从库变成主库，由它来处理客户端请求。</p>
+<h2 id="7"><strong>7、操作系统：内存大页</strong></h2>
+<p>除了内存 swap，还有一个和内存相关的因素，即内存大页机制（Transparent Huge Page, THP），也会影响 Redis 性能。</p>
+<h3 id="7-1-trade-off"><strong>7-1 内存大页 trade-off</strong></h3>
+<p>Linux 内核从 2.6.38 开始支持内存大页机制，<strong>该机制支持 2MB 大小的内存页分配，而常规的内存页分配是按 4KB 的粒度来执行的。</strong></p>
+<p>Redis 是内存数据库，内存大页不正好可以满足 Redis 的需求吗？而且在分配相同的内存量时，内存大页还能减少分配次数，不也是对 Redis 友好吗?</p>
+<p><strong>其实，系统的设计通常是一个取舍过程，我们称之为 trade-off。很多机制通常都是优势和劣势并存的。Redis 使用内存大页就是一个典型的例子。</strong></p>
+<p>虽然内存大页可以给 Redis 带来内存分配方面的收益，不要忘了，Redis 为了提供数据可靠性保证，需要将数据做持久化保存。</p>
+<p>这个写入过程由额外的线程执行，所以，此时，Redis 主线程仍然可以接收客户端写请求。客户端的写请求可能会修改正在进行持久化的数据。</p>
+<p>在这一过程中，Redis 就会采用写时复制机制，也就是说，一旦有数据要被修改，Redis 并不会直接修改内存中的数据，<em>而是将这些数据拷贝一份，然后再进行修改</em>。</p>
+<p><strong>如果采用了内存大页，那么，即使客户端请求只修改 100B 的数据，Redis 也需要拷贝 2MB 的大页。相反，如果是常规内存页机制，只用拷贝 4KB</strong></p>
+<p>当客户端请求修改或新写入数据较多时，内存大页机制将导致大量的拷贝，这就会影响 Redis 正常的访存操作，最终导致性能变慢。</p>
+<h3 id="7-2"><strong>7-2 关闭内存大页</strong></h3>
+<p>首先，我们要先排查下内存大页。方法是：在 Redis 实例运行的机器上执行如下命令:</p>
+<pre><code>cat /sys/kernel/mm/transparent_hugepage/enabled
+</code></pre>
+<p>如果执行结果是 always，就表明内存大页机制被启动了；如果是 never，就表示，内存大页机制被禁止。</p>
+<p><strong>在实际生产环境中部署时，建议不要使用内存大页机制，操作也很简单，只需要执行下面的命令就可以了</strong>：</p>
+<pre><code>echo never &gt; /sys/kernel/mm/transparent_hugepage/enabled
+</code></pre>
+<h2 id="_1">本节小结</h2>
+<p>判断 Redis 变慢的方法，<strong>一个是看响应延迟，一个是看基线性能</strong>。同时，我还给了你两种排查和解决 Redis 变慢这个问题的方法：</p>
+<ul>
+<li><strong>从慢查询命令开始排查，并且根据业务需求替换慢查询命令</strong>；</li>
+<li><strong>排查过期 key 的时间设置，并根据实际使用需求，设置不同的过期时间</strong>。</li>
+</ul>
+<p>9 个检查点的 Checklist，希望你在遇到 Redis 性能变慢时，按照这些步骤逐一检查，高效地解决问题:</p>
+<ol>
+<li>获取 Redis 实例在当前环境下的基线性能。</li>
+<li>是否用了慢查询命令？如果是的话，就使用其他命令替代慢查询命令，或者把聚合计算命令放在客户端做。</li>
+<li>是否对过期 key 设置了相同的过期时间？<strong>对于批量删除的 key，可以在每个 key 的过期时间上加一个随机数，避免同时删除</strong>。</li>
+<li>是否存在 bigkey？ 对于 bigkey 的删除操作，如果你的 Redis 是 4.0 及以上的版本，可以直接利用异步线程机制减少主线程阻塞；如果是 Redis 4.0 以前的版本，<strong>可以使用 SCAN 命令迭代删除；对于 bigkey 的集合查询和聚合操作，可以使用 SCAN 命令在客户端完成</strong>。</li>
+<li>Redis AOF 配置级别是什么？业务层面是否的确需要这一可靠性级别？如果我们需要高性能，同时也允许数据丢失，<strong>可以将配置项 <code>no-appendfsync-on-rewrite</code> 设置为 <code>yes</code></strong>，<strong>避免 AOF 重写和 fsync 竞争磁盘 IO 资源，导致 Redis 延迟增加</strong>。当然， 如果既需要高性能又需要高可靠性，最好使用高速固态盘作为 AOF 日志的写入盘。</li>
+<li>Redis 实例的内存使用是否过大？发生 swap 了吗？如果是的话，就增加机器内存，或者是使用 Redis 集群，分摊单机 Redis 的键值对数量和内存压力。同时，要避免出现 Redis 和其他内存需求大的应用共享机器的情况。</li>
+<li>在 Redis 实例的运行环境中，是否启用了透明大页机制？如果是的话，直接关闭内存大页机制就行了。</li>
+<li>是否运行了 Redis 主从集群？如果是的话，把主库实例的数据量大小控制在 2~4GB，以免主从复制时，从库因加载大的 RDB 文件而阻塞。</li>
+<li>是否使用了多核 CPU 或 NUMA 架构的机器运行 Redis 实例？使用多核 CPU 时，可以给 Redis 实例绑定物理核；使用 NUMA 架构时，注意把 Redis 实例和网络中断处理程序运行在同一个 CPU Socket 上。</li>
+</ol>
+<p>仔细检查下有没有恼人的“邻居”，具体点说，就是 Redis 所在的机器上有没有一些其他占内存、磁盘 IO 和网络 IO 的程序，比如说数据库程序或者数据采集程序。<strong>如果有的话，我建议你将这些程序迁移到其他机器上运行。</strong></p>
+<h3 id="redis_1"><strong>分析、排查、解决Redis变慢问题</strong></h3>
+<ol>
+<li>使用复杂度过高的命令（例如SORT/SUION/ZUNIONSTORE/KEYS），或一次查询全量数据（例如LRANGE key 0 N，但N很大）<ul>
+<li>分析：<ul>
+<li>a) 查看slowlog是否存在这些命令 </li>
+<li>b) Redis进程CPU使用率是否飙升（聚合运算命令导致）</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 不使用复杂度过高的命令，或用其他方式代替实现（放在客户端做）</li>
+<li>b) 数据尽量分批查询（LRANGE key 0 N，建议N&lt;=100，查询全量数据建议使用HSCAN/SSCAN/ZSCAN）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>操作bigkey<ul>
+<li>分析：<ul>
+<li>a) <code>slowlog</code>出现很多<code>SET/DELETE</code>变慢命令（bigkey分配内存和释放内存变慢） </li>
+<li>b) 使用<code>redis-cli -h $host -p $port --bigkeys</code>扫描出很多<code>bigkey</code></li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 优化业务，避免存储bigkey </li>
+<li>b) Redis 4.0+可开启<code>lazy-free</code>机制</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>大量key集中过期<ul>
+<li>分析：<ul>
+<li>a) 业务使用EXPIREAT/PEXPIREAT命令 </li>
+<li>b) Redis info中的<code>expired_keys</code>指标短期突增</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 优化业务，过期增加随机时间，把时间打散，减轻删除过期key的压力 </li>
+<li>b) 运维层面，监控<code>expired_keys</code>指标，有短期突增及时报警排查</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Redis内存达到maxmemory<ul>
+<li>分析：<ul>
+<li>a) 实例内存达到maxmemory，且写入量大，淘汰key压力变大 </li>
+<li>b) Redis info中的<code>evicted_keys</code>指标短期突增</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 业务层面，根据情况调整淘汰策略（随机比LRU快） </li>
+<li>b) 运维层面，监控evicted_keys指标，有短期突增及时报警 </li>
+<li>c) 集群扩容，多个实例减轻淘汰key的压力</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>大量短连接请求<ul>
+<li>分析：Redis处理大量短连接请求，TCP三次握手和四次挥手也会增加耗时</li>
+<li>解决：使用长连接操作Redis</li>
+</ul>
+</li>
+<li>生成RDB和AOF重写fork耗时严重<ul>
+<li>分析：<ul>
+<li>a) Redis变慢只发生在生成RDB和AOF重写期间 </li>
+<li>b) 实例占用内存越大，fork拷贝内存页表越久 </li>
+<li>c) Redis info中<code>latest_fork_usec</code>耗时变长</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 实例尽量小 </li>
+<li>b) Redis尽量部署在物理机上 </li>
+<li>c) 优化备份策略（例如低峰期备份） </li>
+<li>d) 合理配置<code>repl-backlog</code>和<code>slave client-output-buffer-limit</code>，避免主从全量同步 </li>
+<li>e) 视情况考虑关闭AOF </li>
+<li>f) 监控<code>latest_fork_usec</code>耗时是否变长</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>AOF使用<code>awalys</code>机制<ul>
+<li>分析：磁盘IO负载变高</li>
+<li>解决：<ul>
+<li>a) 使用everysec机制 </li>
+<li>b) 丢失数据不敏感的业务不开启AOF</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>使用Swap<ul>
+<li>分析：<ul>
+<li>a) 所有请求全部开始变慢 </li>
+<li>b) slowlog大量慢日志</li>
+<li>c) 查看Redis进程是否使用到了Swap</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 增加机器内存 </li>
+<li>b) 集群扩容 </li>
+<li>c) Swap使用时监控报警</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>进程绑定CPU不合理<ul>
+<li>分析<ul>
+<li>a) Redis进程只绑定一个CPU逻辑核</li>
+<li>b) NUMA架构下，网络中断处理程序和Redis进程没有绑定在同一个Socket下</li>
+</ul>
+</li>
+<li>解决<ul>
+<li>a) Redis进程绑定多个CPU逻辑核</li>
+<li>b) 网络中断处理程序和Redis进程绑定在同一个Socket下</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>开启透明大页机制<ul>
+<li>分析：生成RDB和AOF重写期间，主线程处理写请求耗时变长（拷贝内存副本耗时变长）</li>
+<li>解决：关闭透明大页机制</li>
+</ul>
+</li>
+<li>网卡负载过高<ul>
+<li>分析：<ul>
+<li>a) TCP/IP层延迟变大，丢包重传变多 </li>
+<li>b) 是否存在流量过大的实例占满带宽</li>
+</ul>
+</li>
+<li>解决：<ul>
+<li>a) 机器网络资源监控，负载过高及时报警 </li>
+<li>b) 提前规划部署策略，访问量大的实例隔离部署</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>总之，Redis的性能与CPU、内存、网络、磁盘都息息相关，任何一处发生问题，都会影响到Redis的性能。</p>
+<h3 id="_2">要点&amp;亮点</h3>
+<ul>
+<li>通过<code>redis-cli --intrinsic-latency 120</code>可以得知redis的基准线。后续可以根据基准线的响应速度进行判断是否查询慢</li>
+<li>基于自己对 Redis 本身的工作原理的理解，并且结合和它交互的操作系统、存储以及网络等外部系统关键机制，再借助一些辅助工具来定位原因，并制定行之有效的解决方案</li>
+<li>Redis 自身操作特性的影响<ul>
+<li>慢查询命令：命令操作的复杂度有关<ul>
+<li>排查方法：通过 Redis 日志，或者是 latency monitor 工具，查询变慢的请求</li>
+<li>解决方法：<ul>
+<li>用其他高效命令代替。如不要使用keys查询所有key，可以使用scan进行查询，不会阻塞线程</li>
+<li>当你需要执行排序、交集、并集操作时，可以在客户端完成，而不要用 SORT、SUNION、SINTER 这些命令，以免拖慢 Redis 实例。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>过期 key 操作：redis本身的内存回收机制会造成redis操作阻塞，导致性能变慢（Redis 4.0 后可以用异步线程机制来减少阻塞影响）<ul>
+<li>导致原因：大批量的key同时间内过期，导致删除过期key的机制一直触发，引起redis操作阻塞</li>
+<li>解决方法：对key设定过期时间时，添加一个删除的时间随机数，能避免key存在同一时间过期</li>
+</ul>
+</li>
+<li>redis删除过期key的机制，每100毫秒对一些key进行删除。算法如下<ul>
+<li>采样 <code>ACTIVE_EXPIRE_CYCLE_LOOKUPS_PER_LOOP</code> 个数的 key，并将其中过期的 key 全部删除；</li>
+<li>果超过 25% 的 key 过期了，则重复删除的过程，直到过期 key 的比例降至 25% 以下。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="页脚">
+      
+        
+        <a href="../2redis_cpu/" class="md-footer__link md-footer__link--prev" aria-label="上一页: 第二节 在多核CPU架构和NUMA架构下对redis进行优化配置" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                上一页
+              </span>
+              第二节 在多核CPU架构和NUMA架构下对redis进行优化配置
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../4redis_fragmentation/" class="md-footer__link md-footer__link--next" aria-label="下一页: 第四节 删除数据后，内存占用率还是很高" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                下一页
+              </span>
+              第四节 删除数据后，内存占用率还是很高
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021-9999 Jacob Xi
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "translations": {"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.term.missing": "\u7f3a\u5c11", "select.version.title": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "search": "../../assets/javascripts/workers/search.bd0b6b67.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.467223ff.min.js"></script>
+      
+    
+  </body>
+</html>
